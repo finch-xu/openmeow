@@ -12,6 +12,7 @@
   <a href="#features">Features</a> &bull;
   <a href="#installation">Installation</a> &bull;
   <a href="#api">API</a> &bull;
+  <a href="#use-with-openclaw">OpenClaw</a> &bull;
   <a href="#models">Models</a> &bull;
   <a href="#building">Building</a> &bull;
   <a href="README_CN.md">中文</a>
@@ -26,6 +27,7 @@
 - **Multiple engines** — sherpa-onnx, WhisperKit, speech-swift (Qwen3-TTS/ASR)
 - **Audio format support** — WAV, MP3, Opus (OGG/WebM), PCM, FLAC, AAC
 - **Model store** — download and manage models from the built-in registry
+- **Works with OpenClaw** — give [OpenClaw](https://github.com/openclaw/openclaw) local voice capabilities in one line of config
 - **Privacy first** — everything runs locally, no data leaves your machine
 
 ## Requirements
@@ -64,6 +66,53 @@ curl -X POST http://127.0.0.1:23333/v1/audio/speech \
 curl -X POST http://127.0.0.1:23333/v1/audio/transcriptions \
   -F "file=@audio.wav" \
   -F "model=whisper-large-v3-turbo"
+```
+
+## Use with OpenClaw
+
+OpenMeow speaks the same API as OpenAI, so [OpenClaw](https://github.com/openclaw/openclaw) can use it as a local voice backend with zero cloud dependency.
+
+**TTS** — add to your OpenClaw config:
+
+```jsonc
+"messages": {
+  "tts": {
+    "auto": "always",
+    "provider": "openai",
+    "providers": {
+      "openai": {
+        "apiKey": "dummy-key",
+        "baseUrl": "http://127.0.0.1:23333/v1",
+        "model": "qwen3-tts-1.7b-mlx",
+        "voice": "Vivian"
+      }
+    },
+    "timeoutMs": 60000
+  }
+}
+```
+
+**ASR** — add to `tools.media.audio`:
+
+```jsonc
+"tools": {
+  "media": {
+    "audio": {
+      "enabled": true,
+      "models": [
+        {
+          "type": "cli",
+          "command": "/bin/sh",
+          "args": [
+            "-c",
+            "curl -s http://127.0.0.1:23333/v1/audio/transcriptions -F file=@{{MediaPath}} -F model=qwen3-asr-0.6b-mlx | jq -r .text"
+          ],
+          "timeoutSeconds": 60
+        }
+      ]
+    }
+  }
+}
 ```
 
 ## Models

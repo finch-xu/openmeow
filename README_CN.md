@@ -12,6 +12,7 @@
   <a href="#功能">功能</a> &bull;
   <a href="#安装">安装</a> &bull;
   <a href="#api-接口">API</a> &bull;
+  <a href="#接入-openclaw">OpenClaw</a> &bull;
   <a href="#模型">模型</a> &bull;
   <a href="#构建">构建</a> &bull;
   <a href="README.md">English</a>
@@ -26,6 +27,7 @@
 - **多引擎支持** — sherpa-onnx、WhisperKit、speech-swift（Qwen3-TTS/ASR）
 - **音频格式** — WAV、MP3、Opus（OGG/WebM）、PCM、FLAC、AAC
 - **模型商店** — 内置模型注册表，一键下载管理
+- **接入 OpenClaw** — 一行配置即可让 [OpenClaw](https://github.com/openclaw/openclaw) 获得本地语音能力
 - **隐私优先** — 所有处理在本地完成，数据不会离开你的设备
 
 ## 系统要求
@@ -64,6 +66,53 @@ curl -X POST http://127.0.0.1:23333/v1/audio/speech \
 curl -X POST http://127.0.0.1:23333/v1/audio/transcriptions \
   -F "file=@audio.wav" \
   -F "model=whisper-large-v3-turbo"
+```
+
+## 接入 OpenClaw
+
+OpenMeow 的 API 与 OpenAI 完全兼容，[OpenClaw](https://github.com/openclaw/openclaw) 可以直接将其作为本地语音后端，无需任何云服务。
+
+**TTS** — 添加到 OpenClaw 配置中：
+
+```jsonc
+"messages": {
+  "tts": {
+    "auto": "always",
+    "provider": "openai",
+    "providers": {
+      "openai": {
+        "apiKey": "dummy-key",
+        "baseUrl": "http://127.0.0.1:23333/v1",
+        "model": "qwen3-tts-1.7b-mlx",
+        "voice": "Vivian"
+      }
+    },
+    "timeoutMs": 60000
+  }
+}
+```
+
+**ASR** — 添加到 `tools.media.audio`：
+
+```jsonc
+"tools": {
+  "media": {
+    "audio": {
+      "enabled": true,
+      "models": [
+        {
+          "type": "cli",
+          "command": "/bin/sh",
+          "args": [
+            "-c",
+            "curl -s http://127.0.0.1:23333/v1/audio/transcriptions -F file=@{{MediaPath}} -F model=qwen3-asr-0.6b-mlx | jq -r .text"
+          ],
+          "timeoutSeconds": 60
+        }
+      ]
+    }
+  }
+}
 ```
 
 ## 模型
