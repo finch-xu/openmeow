@@ -28,6 +28,10 @@
 
 ---
 
+<p align="center">
+  <img src="assets/screenshot_models.png" width="720" alt="OpenMeow 模型管理">
+</p>
+
 ## 功能
 
 - **菜单栏应用** — 在 macOS 后台静默运行（Apple Silicon）

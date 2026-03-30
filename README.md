@@ -28,6 +28,10 @@
 
 ---
 
+<p align="center">
+  <img src="assets/screenshot_models.png" width="720" alt="OpenMeow Models">
+</p>
+
 ## Features
 
 - **Menu bar app** — runs quietly in the background on macOS (Apple Silicon)
