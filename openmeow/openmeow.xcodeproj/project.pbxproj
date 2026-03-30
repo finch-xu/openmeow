@@ -343,7 +343,7 @@
 					"$(PROJECT_DIR)/../Frameworks/opus.xcframework/macos-arm64_x86_64",
 					"$(PROJECT_DIR)/../Frameworks/lame.xcframework/macos-arm64",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 0.1.0;
 				OTHER_LDFLAGS = (
 					"-lsherpa-onnx",
@@ -394,7 +394,7 @@
 					"$(PROJECT_DIR)/../Frameworks/opus.xcframework/macos-arm64_x86_64",
 					"$(PROJECT_DIR)/../Frameworks/lame.xcframework/macos-arm64",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 0.1.0;
 				OTHER_LDFLAGS = (
 					"-lsherpa-onnx",

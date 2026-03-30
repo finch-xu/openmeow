@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="openmeow/openmeow/Assets.xcassets/AppIcon.appiconset/icon_256x256.png" width="128" height="128" alt="OpenMeow">
+  <img src="assets/icon_readme.png" width="128" height="128" alt="OpenMeow">
 </p>
 
 <h1 align="center">OpenMeow</h1>
