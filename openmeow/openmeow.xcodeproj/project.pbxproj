@@ -344,7 +344,7 @@
 					"$(PROJECT_DIR)/../Frameworks/lame.xcframework/macos-arm64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1.0;
 				OTHER_LDFLAGS = (
 					"-lsherpa-onnx",
 					"-lonnxruntime",
@@ -395,7 +395,7 @@
 					"$(PROJECT_DIR)/../Frameworks/lame.xcframework/macos-arm64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1.0;
 				OTHER_LDFLAGS = (
 					"-lsherpa-onnx",
 					"-lonnxruntime",
