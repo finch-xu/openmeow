@@ -1,0 +1,212 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v0.1.0)'
+        required: true
+
+jobs:
+  build-and-release:
+    runs-on: macos-15
+    environment: APPLE_CERTIFICATE
+    timeout-minutes: 90
+
+    permissions:
+      contents: write
+
+    steps:
+      # ── Checkout ──────────────────────────────────────────────
+      - uses: actions/checkout@v4
+
+      - name: Set paths
+        run: |
+          echo "KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db" >> "$GITHUB_ENV"
+          echo "ARCHIVE_PATH=$RUNNER_TEMP/openmeow.xcarchive" >> "$GITHUB_ENV"
+          echo "EXPORT_PATH=$RUNNER_TEMP/export" >> "$GITHUB_ENV"
+          echo "KEYCHAIN_PASSWORD=$(openssl rand -hex 16)" >> "$GITHUB_ENV"
+
+      # ── Xcode ─────────────────────────────────────────────────
+      - name: Select Xcode
+        run: |
+          XCODE_PATH=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          sudo xcode-select -s "$XCODE_PATH"
+          xcodebuild -version
+          swift --version
+
+      # ── Import Certificate ────────────────────────────────────
+      - name: Import Developer ID certificate
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          CERT_PATH=$RUNNER_TEMP/certificate.p12
+          echo -n "$APPLE_CERTIFICATE" | base64 --decode -o "$CERT_PATH"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          security import "$CERT_PATH" \
+            -P "$APPLE_CERTIFICATE_PASSWORD" \
+            -A -t cert -f pkcs12 \
+            -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple: \
+            -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          security list-keychains -d user -s "$KEYCHAIN_PATH" \
+            $(security list-keychains -d user | tr -d '"')
+
+          rm -f "$CERT_PATH"
+
+      # ── Cache Frameworks ──────────────────────────────────────
+      - name: Cache Frameworks
+        id: cache-frameworks
+        uses: actions/cache@v4
+        with:
+          path: Frameworks
+          key: frameworks-macos-arm64-${{ hashFiles('Scripts/download-sherpa-onnx.sh', 'Scripts/download-opus.sh', 'Scripts/download-lame.sh') }}
+
+      - name: Build frameworks
+        if: steps.cache-frameworks.outputs.cache-hit != 'true'
+        run: |
+          Scripts/download-sherpa-onnx.sh
+          Scripts/download-opus.sh
+          Scripts/download-lame.sh
+
+      # ── Dependencies ──────────────────────────────────────────
+      - name: Install license-plist
+        run: brew install licenseplist
+
+      # ── Build ─────────────────────────────────────────────────
+      - name: Archive app
+        env:
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcodebuild archive \
+            -project openmeow/openmeow.xcodeproj \
+            -scheme openmeow \
+            -configuration Release \
+            -archivePath "$ARCHIVE_PATH" \
+            -destination "generic/platform=macOS" \
+            ARCHS=arm64 \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="$APPLE_SIGNING_IDENTITY" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            OTHER_CODE_SIGN_FLAGS="--options=runtime" \
+            ENABLE_HARDENED_RUNTIME=YES
+
+      - name: Export app
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+            "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>developer-id</string>
+            <key>teamID</key>
+            <string>${APPLE_TEAM_ID}</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>signingCertificate</key>
+            <string>${APPLE_SIGNING_IDENTITY}</string>
+          </dict>
+          </plist>
+          EOF
+
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE_PATH" \
+            -exportPath "$EXPORT_PATH" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
+
+      # ── Verify Signature ──────────────────────────────────────
+      - name: Verify code signature
+        run: |
+          APP_PATH="$EXPORT_PATH/openmeow.app"
+          echo "── codesign verify ──"
+          codesign --verify --deep --strict --verbose=2 "$APP_PATH"
+          echo "── spctl assess ──"
+          spctl --assess --type exec --verbose "$APP_PATH" || true
+          echo "── signature info ──"
+          codesign -dv "$APP_PATH" 2>&1
+
+      # ── Package DMG ───────────────────────────────────────────
+      - name: Create DMG
+        id: dmg
+        env:
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          REF_TAG: ${{ github.ref_name }}
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          TAG="${REF_TAG}"
+          if [ -z "$TAG" ] || [ "$TAG" = "$GITHUB_REF" ]; then
+            TAG="${INPUT_TAG}"
+          fi
+          VERSION="${TAG#v}"
+
+          DMG_NAME="OpenMeow-${VERSION}-arm64.dmg"
+          DMG_PATH="$RUNNER_TEMP/$DMG_NAME"
+
+          STAGING="$RUNNER_TEMP/dmg-staging"
+          mkdir -p "$STAGING"
+          cp -R "$EXPORT_PATH/openmeow.app" "$STAGING/OpenMeow.app"
+          ln -s /Applications "$STAGING/Applications"
+
+          hdiutil create -volname "OpenMeow" \
+            -srcfolder "$STAGING" \
+            -ov -format UDZO \
+            "$DMG_PATH"
+
+          codesign --force --sign "$APPLE_SIGNING_IDENTITY" "$DMG_PATH"
+
+          echo "dmg_path=$DMG_PATH" >> "$GITHUB_OUTPUT"
+          echo "dmg_name=$DMG_NAME" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      # ── Notarize ──────────────────────────────────────────────
+      - name: Notarize DMG
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          DMG_PATH: ${{ steps.dmg.outputs.dmg_path }}
+        run: |
+          xcrun notarytool submit "$DMG_PATH" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait \
+            --timeout 30m
+
+      - name: Staple notarization ticket
+        env:
+          DMG_PATH: ${{ steps.dmg.outputs.dmg_path }}
+        run: xcrun stapler staple "$DMG_PATH"
+
+      # ── Release ───────────────────────────────────────────────
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name || inputs.tag }}
+          name: OpenMeow ${{ steps.dmg.outputs.version }}
+          files: ${{ steps.dmg.outputs.dmg_path }}
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref_name || inputs.tag, '-') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Cleanup ───────────────────────────────────────────────
+      - name: Cleanup keychain
+        if: always()
+        run: security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
