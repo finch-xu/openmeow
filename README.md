@@ -166,4 +166,15 @@ open openmeow/openmeow.xcodeproj
 
 [MIT](LICENSE)
 
-LAME MP3 encoder is dynamically linked under [LGPL-2.0](THIRD-PARTY-LICENSES). You may replace `libmp3lame.dylib` with your own build.
+### Third-Party Components
+
+| Component | License | Link |
+|-----------|---------|------|
+| [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) | Apache-2.0 | On-device speech (TTS/ASR) |
+| [WhisperKit](https://github.com/argmaxinc/WhisperKit) | MIT | CoreML-based speech recognition |
+| [speech-swift](https://github.com/soniqo/speech-swift) | Apache-2.0 | Qwen3-TTS/ASR via MLX |
+| [Hummingbird](https://github.com/hummingbird-project/hummingbird) | Apache-2.0 | Lightweight HTTP server |
+| [Opus](https://github.com/xiph/opus) / [Ogg](https://github.com/xiph/ogg) | BSD-3-Clause | Audio codec |
+| [LAME](https://lame.sourceforge.io/) | LGPL-2.0 | MP3 encoder (dynamically linked) |
+
+LAME is the only LGPL component and is dynamically linked as `libmp3lame.dylib`. You may replace it with your own build. See [THIRD-PARTY-LICENSES](THIRD-PARTY-LICENSES) for details.

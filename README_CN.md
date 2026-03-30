@@ -166,4 +166,15 @@ open openmeow/openmeow.xcodeproj
 
 [MIT](LICENSE)
 
-LAME MP3 编码器以动态链接方式使用，遵循 [LGPL-2.0](THIRD-PARTY-LICENSES)。你可以用自己编译的版本替换 `libmp3lame.dylib`。
+### 第三方组件
+
+| 组件 | 许可证 | 说明 |
+|------|--------|------|
+| [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) | Apache-2.0 | 端侧语音引擎（TTS/ASR）|
+| [WhisperKit](https://github.com/argmaxinc/WhisperKit) | MIT | 基于 CoreML 的语音识别 |
+| [speech-swift](https://github.com/soniqo/speech-swift) | Apache-2.0 | Qwen3-TTS/ASR（MLX 加速）|
+| [Hummingbird](https://github.com/hummingbird-project/hummingbird) | Apache-2.0 | 轻量 HTTP 服务器 |
+| [Opus](https://github.com/xiph/opus) / [Ogg](https://github.com/xiph/ogg) | BSD-3-Clause | 音频编解码器 |
+| [LAME](https://lame.sourceforge.io/) | LGPL-2.0 | MP3 编码器（动态链接）|
+
+LAME 是唯一的 LGPL 组件，以动态链接方式（`libmp3lame.dylib`）使用。你可以用自己编译的版本替换。详见 [THIRD-PARTY-LICENSES](THIRD-PARTY-LICENSES)。
