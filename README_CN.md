@@ -5,7 +5,7 @@
 <h1 align="center">OpenMeow</h1>
 
 <p align="center">
-  原生 macOS 菜单栏应用，本地运行的 OpenAI 兼容语音 API 网关。
+  原生 macOS 菜单栏应用，提供本地 TTS/ASR 语音服务，兼容 OpenAI API。
 </p>
 
 <p align="center">

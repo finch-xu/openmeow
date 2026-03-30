@@ -5,7 +5,7 @@
 <h1 align="center">OpenMeow</h1>
 
 <p align="center">
-  A native macOS menu bar app that serves as a local, OpenAI-compatible voice API gateway.
+  A native macOS menu bar app providing local TTS/ASR services via an OpenAI-compatible API.
 </p>
 
 <p align="center">
