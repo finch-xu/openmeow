@@ -22,6 +22,8 @@ bash build-swift-macos.sh
 # Copy xcframework to project
 if [ -d "build-swift-macos/sherpa-onnx.xcframework" ]; then
     cp -R build-swift-macos/sherpa-onnx.xcframework "$FRAMEWORK_DIR/"
+    # Copy libonnxruntime.a into xcframework (required for linking)
+    cp build-swift-macos/install/lib/libonnxruntime.a "$FRAMEWORK_DIR/sherpa-onnx.xcframework/macos-arm64_x86_64/"
     echo "Done: $FRAMEWORK_DIR/sherpa-onnx.xcframework"
 else
     echo "ERROR: xcframework not found after build"
