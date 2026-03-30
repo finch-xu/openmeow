@@ -9,6 +9,14 @@
 </p>
 
 <p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+  <img src="https://img.shields.io/badge/platform-macOS-lightgrey.svg" alt="Platform">
+  <img src="https://img.shields.io/badge/Apple_Silicon-M1%2B-black.svg?logo=apple" alt="Apple Silicon">
+  <img src="https://img.shields.io/badge/Swift-6.3-F05138.svg?logo=swift&logoColor=white" alt="Swift">
+  <img src="https://img.shields.io/badge/API-OpenAI_Compatible-10a37f.svg" alt="OpenAI Compatible">
+</p>
+
+<p align="center">
   <a href="#features">Features</a> &bull;
   <a href="#installation">Installation</a> &bull;
   <a href="#api">API</a> &bull;

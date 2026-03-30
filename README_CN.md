@@ -9,6 +9,14 @@
 </p>
 
 <p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="许可证"></a>
+  <img src="https://img.shields.io/badge/platform-macOS-lightgrey.svg" alt="平台">
+  <img src="https://img.shields.io/badge/Apple_Silicon-M1%2B-black.svg?logo=apple" alt="Apple Silicon">
+  <img src="https://img.shields.io/badge/Swift-6.3-F05138.svg?logo=swift&logoColor=white" alt="Swift">
+  <img src="https://img.shields.io/badge/API-OpenAI_Compatible-10a37f.svg" alt="OpenAI 兼容">
+</p>
+
+<p align="center">
   <a href="#功能">功能</a> &bull;
   <a href="#安装">安装</a> &bull;
   <a href="#api-接口">API</a> &bull;
