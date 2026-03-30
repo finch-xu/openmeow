@@ -1,7 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-# Build or download sherpa-onnx xcframework for macOS
+# Download pre-built sherpa-onnx xcframework for macOS (arm64)
+SHERPA_VERSION="v1.12.34"
 FRAMEWORK_DIR="$(cd "$(dirname "$0")/.." && pwd)/Frameworks"
 mkdir -p "$FRAMEWORK_DIR"
 
@@ -10,25 +11,25 @@ if [ -d "$FRAMEWORK_DIR/sherpa-onnx.xcframework" ]; then
     exit 0
 fi
 
-echo "Building sherpa-onnx from source..."
+BASE_URL="https://github.com/k2-fsa/sherpa-onnx/releases/download/${SHERPA_VERSION}"
+XCFW_TAR="sherpa-onnx-${SHERPA_VERSION}-macos-xcframework-static.tar.bz2"
+STATIC_TAR="sherpa-onnx-${SHERPA_VERSION}-osx-arm64-static-lib.tar.bz2"
+
 BUILD_DIR=$(mktemp -d)
 cd "$BUILD_DIR"
 
-git clone --depth 1 https://github.com/k2-fsa/sherpa-onnx.git
-cd sherpa-onnx
-
-bash build-swift-macos.sh
+echo "Downloading pre-built sherpa-onnx ${SHERPA_VERSION}..."
+curl -sL "${BASE_URL}/${XCFW_TAR}" | tar -xjf -
+curl -sL "${BASE_URL}/${STATIC_TAR}" | tar -xjf -
 
 # Copy xcframework to project
-if [ -d "build-swift-macos/sherpa-onnx.xcframework" ]; then
-    cp -R build-swift-macos/sherpa-onnx.xcframework "$FRAMEWORK_DIR/"
-    # Copy libonnxruntime.a into xcframework (required for linking)
-    cp build-swift-macos/install/lib/libonnxruntime.a "$FRAMEWORK_DIR/sherpa-onnx.xcframework/macos-arm64_x86_64/"
-    echo "Done: $FRAMEWORK_DIR/sherpa-onnx.xcframework"
-else
-    echo "ERROR: xcframework not found after build"
-    exit 1
-fi
+XCFW_SRC="sherpa-onnx-${SHERPA_VERSION}-macos-xcframework-static/sherpa-onnx.xcframework"
+STATIC_SRC="sherpa-onnx-${SHERPA_VERSION}-osx-arm64-static-lib/lib/libonnxruntime.a"
+
+cp -R "$XCFW_SRC" "$FRAMEWORK_DIR/"
+cp "$STATIC_SRC" "$FRAMEWORK_DIR/sherpa-onnx.xcframework/macos-arm64_x86_64/"
+
+echo "Done: $FRAMEWORK_DIR/sherpa-onnx.xcframework"
 
 # Cleanup
 rm -rf "$BUILD_DIR"
