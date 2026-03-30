@@ -1,0 +1,30 @@
+Third-Party Licenses
+====================
+
+OpenMeow is licensed under the MIT License. However, the binary distribution
+includes the following third-party component under a different license:
+
+
+LAME MP3 Encoder
+-----------------
+License: LGPL-2.0 (GNU Lesser General Public License, version 2.0)
+Website: https://lame.sourceforge.io/
+Source:  https://sourceforge.net/projects/lame/files/lame/3.100/lame-3.100.tar.gz
+
+OpenMeow uses LAME for MP3 audio encoding. LAME is dynamically linked as
+libmp3lame.dylib and is NOT part of the OpenMeow source code. The OpenMeow
+source code remains under the MIT License.
+
+Per the terms of the LGPL-2.0, you have the right to:
+  - Replace libmp3lame.dylib with a modified version
+  - Obtain the LAME source code from the link above
+
+To replace the LAME library:
+  1. Right-click OpenMeow.app -> Show Package Contents
+  2. Navigate to Contents/Frameworks/
+  3. Replace libmp3lame.dylib with your own build
+  4. Re-sign the dylib: codesign --force --sign - libmp3lame.dylib
+
+The full text of the LGPL-2.0 license is included in the lame.xcframework
+directory as LICENSE-lame, and can also be found at:
+https://www.gnu.org/licenses/old-licenses/lgpl-2.0.html

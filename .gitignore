@@ -60,3 +60,17 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+
+# OpenMeow - large binary files
+Frameworks/
+Resources/Models/
+*.pkg
+*.tar.bz2
+
+mydata/
+.DS_Store
+CLAUDE.md
+docs/
+todo/
+tasks/
+.claude/

@@ -1,0 +1,11 @@
+# Allowed license types for OpenMeow (MIT project)
+# One license identifier per line. Lines starting with # are comments.
+# Package-level exemptions: add "package:identity" to skip checking.
+MIT
+Apache-2.0
+BSD-2-Clause
+BSD-3-Clause
+ISC
+Zlib
+BSL-1.0
+Unicode-3.0

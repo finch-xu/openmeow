@@ -1,0 +1,501 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6ADFDD852F7579F800036C04 /* Hummingbird in Frameworks */ = {isa = PBXBuildFile; productRef = AA000001AAAA000100000001 /* Hummingbird */; };
+		BB000004BBBB000400000004 /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = BB000002BBBB000200000002 /* WhisperKit */; };
+		BB000005BBBB000500000005 /* TTSKit in Frameworks */ = {isa = PBXBuildFile; productRef = BB000003BBBB000300000003 /* TTSKit */; };
+		CC000004CCCC000400000004 /* Qwen3TTS in Frameworks */ = {isa = PBXBuildFile; productRef = CC000002CCCC000200000002 /* Qwen3TTS */; };
+		CC000005CCCC000500000005 /* Qwen3ASR in Frameworks */ = {isa = PBXBuildFile; productRef = CC000003CCCC000300000003 /* Qwen3ASR */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		6ADFDCE52F756E1F00036C04 /* openmeow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = openmeow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		6ADFDCE72F756E1F00036C04 /* openmeow */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = openmeow;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6ADFDCE22F756E1F00036C04 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6ADFDD852F7579F800036C04 /* Hummingbird in Frameworks */,
+				BB000004BBBB000400000004 /* WhisperKit in Frameworks */,
+				BB000005BBBB000500000005 /* TTSKit in Frameworks */,
+				CC000004CCCC000400000004 /* Qwen3TTS in Frameworks */,
+				CC000005CCCC000500000005 /* Qwen3ASR in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6ADFDCDC2F756E1F00036C04 = {
+			isa = PBXGroup;
+			children = (
+				6ADFDCE72F756E1F00036C04 /* openmeow */,
+				6ADFDCE62F756E1F00036C04 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6ADFDCE62F756E1F00036C04 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6ADFDCE52F756E1F00036C04 /* openmeow.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6ADFDCE42F756E1F00036C04 /* openmeow */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6ADFDCF02F756E1F00036C04 /* Build configuration list for PBXNativeTarget "openmeow" */;
+			buildPhases = (
+				DD000001DDDD000100000001 /* Check Licenses */,
+				6ADFDCE12F756E1F00036C04 /* Sources */,
+				6ADFDCE22F756E1F00036C04 /* Frameworks */,
+				DD000003DDDD000300000003 /* Embed LAME dylib */,
+				6ADFDCE32F756E1F00036C04 /* Resources */,
+				DD000002DDDD000200000002 /* Generate License Plist */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				6ADFDCE72F756E1F00036C04 /* openmeow */,
+			);
+			name = openmeow;
+			packageProductDependencies = (
+				AA000001AAAA000100000001 /* Hummingbird */,
+				BB000002BBBB000200000002 /* WhisperKit */,
+				BB000003BBBB000300000003 /* TTSKit */,
+				CC000002CCCC000200000002 /* Qwen3TTS */,
+				CC000003CCCC000300000003 /* Qwen3ASR */,
+			);
+			productName = openmeow;
+			productReference = 6ADFDCE52F756E1F00036C04 /* openmeow.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6ADFDCDD2F756E1F00036C04 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2640;
+				LastUpgradeCheck = 2640;
+				TargetAttributes = {
+					6ADFDCE42F756E1F00036C04 = {
+						CreatedOnToolsVersion = 26.4;
+					};
+				};
+			};
+			buildConfigurationList = 6ADFDCE02F756E1F00036C04 /* Build configuration list for PBXProject "openmeow" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+			);
+			mainGroup = 6ADFDCDC2F756E1F00036C04;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AA000002AAAA000200000002 /* XCRemoteSwiftPackageReference "hummingbird" */,
+				BB000001BBBB000100000001 /* XCRemoteSwiftPackageReference "WhisperKit" */,
+				CC000001CCCC000100000001 /* XCRemoteSwiftPackageReference "speech-swift" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 6ADFDCE62F756E1F00036C04 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6ADFDCE42F756E1F00036C04 /* openmeow */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6ADFDCE32F756E1F00036C04 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		DD000001DDDD000100000001 /* Check Licenses */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Licenses";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\"${PROJECT_DIR}/../Scripts/check_licenses.sh\"\n";
+		};
+		DD000002DDDD000200000002 /* Generate License Plist */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate License Plist";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\"${PROJECT_DIR}/../Scripts/generate_license_plist.sh\"\n";
+		};
+		DD000003DDDD000300000003 /* Embed LAME dylib */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(PROJECT_DIR)/../Frameworks/lame.xcframework/macos-arm64/libmp3lame.dylib",
+			);
+			name = "Embed LAME dylib";
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/libmp3lame.dylib",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "DYLIB_SRC=\"${PROJECT_DIR}/../Frameworks/lame.xcframework/macos-arm64/libmp3lame.dylib\"\nif [ -f \"$DYLIB_SRC\" ]; then\n    DYLIB_DST=\"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\n    mkdir -p \"$DYLIB_DST\"\n    cp \"$DYLIB_SRC\" \"$DYLIB_DST/\"\n    codesign --force --sign \"${EXPANDED_CODE_SIGN_IDENTITY}\" \"$DYLIB_DST/libmp3lame.dylib\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6ADFDCE12F756E1F00036C04 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		6ADFDCEE2F756E1F00036C04 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = WD4L9846K7;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		6ADFDCEF2F756E1F00036C04 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = WD4L9846K7;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		6ADFDCF12F756E1F00036C04 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = openmeow/openmeow.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WD4L9846K7;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../Frameworks/sherpa-onnx.xcframework/macos-arm64_x86_64/Headers",
+					"$(PROJECT_DIR)/../Frameworks/opus.xcframework/macos-arm64_x86_64/Headers",
+					"$(PROJECT_DIR)/../Frameworks/lame.xcframework/macos-arm64/Headers",
+				);
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "OpenMeow needs microphone access for speech recognition testing.";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../Frameworks/sherpa-onnx.xcframework/macos-arm64_x86_64",
+					"$(PROJECT_DIR)/../Frameworks/opus.xcframework/macos-arm64_x86_64",
+					"$(PROJECT_DIR)/../Frameworks/lame.xcframework/macos-arm64",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-lsherpa-onnx",
+					"-lonnxruntime",
+					"-lopus",
+					"-logg",
+					"-lmp3lame",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pidan.openmeow;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) SHERPA_ONNX_AVAILABLE WHISPERKIT_AVAILABLE SPEECH_SWIFT_AVAILABLE OPUS_AVAILABLE LAME_AVAILABLE";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = openmeow/BridgingHeader.h;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.3;
+			};
+			name = Debug;
+		};
+		6ADFDCF22F756E1F00036C04 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = openmeow/openmeow.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WD4L9846K7;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../Frameworks/sherpa-onnx.xcframework/macos-arm64_x86_64/Headers",
+					"$(PROJECT_DIR)/../Frameworks/opus.xcframework/macos-arm64_x86_64/Headers",
+					"$(PROJECT_DIR)/../Frameworks/lame.xcframework/macos-arm64/Headers",
+				);
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "OpenMeow needs microphone access for speech recognition testing.";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../Frameworks/sherpa-onnx.xcframework/macos-arm64_x86_64",
+					"$(PROJECT_DIR)/../Frameworks/opus.xcframework/macos-arm64_x86_64",
+					"$(PROJECT_DIR)/../Frameworks/lame.xcframework/macos-arm64",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-lsherpa-onnx",
+					"-lonnxruntime",
+					"-lopus",
+					"-logg",
+					"-lmp3lame",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pidan.openmeow;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) SHERPA_ONNX_AVAILABLE WHISPERKIT_AVAILABLE SPEECH_SWIFT_AVAILABLE OPUS_AVAILABLE LAME_AVAILABLE";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = openmeow/BridgingHeader.h;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.3;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6ADFDCE02F756E1F00036C04 /* Build configuration list for PBXProject "openmeow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6ADFDCEE2F756E1F00036C04 /* Debug */,
+				6ADFDCEF2F756E1F00036C04 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6ADFDCF02F756E1F00036C04 /* Build configuration list for PBXNativeTarget "openmeow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6ADFDCF12F756E1F00036C04 /* Debug */,
+				6ADFDCF22F756E1F00036C04 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AA000002AAAA000200000002 /* XCRemoteSwiftPackageReference "hummingbird" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hummingbird-project/hummingbird.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+		BB000001BBBB000100000001 /* XCRemoteSwiftPackageReference "WhisperKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/argmaxinc/WhisperKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.17.0;
+			};
+		};
+		CC000001CCCC000100000001 /* XCRemoteSwiftPackageReference "speech-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/soniqo/speech-swift.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.0.7;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AA000001AAAA000100000001 /* Hummingbird */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA000002AAAA000200000002 /* XCRemoteSwiftPackageReference "hummingbird" */;
+			productName = Hummingbird;
+		};
+		BB000002BBBB000200000002 /* WhisperKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB000001BBBB000100000001 /* XCRemoteSwiftPackageReference "WhisperKit" */;
+			productName = WhisperKit;
+		};
+		BB000003BBBB000300000003 /* TTSKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB000001BBBB000100000001 /* XCRemoteSwiftPackageReference "WhisperKit" */;
+			productName = TTSKit;
+		};
+		CC000002CCCC000200000002 /* Qwen3TTS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CC000001CCCC000100000001 /* XCRemoteSwiftPackageReference "speech-swift" */;
+			productName = Qwen3TTS;
+		};
+		CC000003CCCC000300000003 /* Qwen3ASR */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CC000001CCCC000100000001 /* XCRemoteSwiftPackageReference "speech-swift" */;
+			productName = Qwen3ASR;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 6ADFDCDD2F756E1F00036C04 /* Project object */;
+}

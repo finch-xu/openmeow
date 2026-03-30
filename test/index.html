@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenMeow API Tester</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f7; color: #1d1d1f; padding: 24px; max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 24px; margin-bottom: 4px; }
+  h1 span { font-size: 13px; color: #86868b; font-weight: normal; }
+  .config { display: flex; gap: 10px; align-items: center; margin: 16px 0 24px; padding: 12px 16px; background: #fff; border-radius: 10px; border: 1px solid #d2d2d7; flex-wrap: wrap; }
+  .config label { font-size: 13px; color: #86868b; white-space: nowrap; }
+  .config input { flex: 1; padding: 6px 10px; border: 1px solid #d2d2d7; border-radius: 6px; font-size: 13px; font-family: 'SF Mono', monospace; }
+  .config button { flex-shrink: 0; }
+  .card { background: #fff; border-radius: 12px; border: 1px solid #d2d2d7; padding: 20px; margin-bottom: 16px; }
+  .card h2 { font-size: 15px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .card h2 .method { font-size: 11px; font-weight: 700; font-family: monospace; padding: 2px 6px; border-radius: 4px; }
+  .get { background: #e8f5e9; color: #2e7d32; }
+  .post { background: #e3f2fd; color: #1565c0; }
+  .row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .row label { font-size: 13px; color: #86868b; min-width: 60px; text-align: right; }
+  input, select, textarea { padding: 7px 10px; border: 1px solid #d2d2d7; border-radius: 6px; font-size: 13px; }
+  textarea { width: 100%; resize: vertical; font-family: inherit; }
+  select { min-width: 160px; }
+  input[type="file"] { font-size: 12px; }
+  button { padding: 7px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity .15s; }
+  button:hover { opacity: .85; }
+  .btn-primary { background: #0071e3; color: #fff; }
+  .btn-secondary { background: #e8e8ed; color: #1d1d1f; }
+  .result { margin-top: 12px; padding: 10px 14px; background: #f5f5f7; border-radius: 8px; font-size: 13px; font-family: 'SF Mono', monospace; white-space: pre-wrap; word-break: break-all; max-height: 260px; overflow-y: auto; display: none; }
+  .result.show { display: block; }
+  .result.error { background: #fef0f0; color: #c62828; }
+  .result.ok { background: #f0faf0; }
+  audio { margin-top: 10px; width: 100%; }
+  .flex-1 { flex: 1; }
+  .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-left: 4px; }
+  .status-dot.ok { background: #34c759; }
+  .status-dot.err { background: #ff3b30; }
+  .status-dot.loading { background: #ff9500; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+</style>
+</head>
+<body>
+
+<h1>OpenMeow API Tester <span>v0.2</span></h1>
+
+<div class="config">
+  <label>Base URL</label>
+  <input type="text" id="baseUrl" value="http://127.0.0.1:23333" style="max-width:260px">
+  <label>Token</label>
+  <input type="text" id="authToken" placeholder="sk-... (optional)" style="min-width:180px">
+  <button class="btn-primary" onclick="refreshAll()">Refresh Models</button>
+  <span id="connStatus"></span>
+</div>
+
+<!-- Health Check -->
+<div class="card">
+  <h2><span class="method get">GET</span> /health</h2>
+  <button class="btn-primary" onclick="checkHealth()">Check</button>
+  <div class="result" id="healthResult"></div>
+</div>
+
+<!-- Models -->
+<div class="card">
+  <h2><span class="method get">GET</span> /v1/models</h2>
+  <button class="btn-primary" onclick="listModels()">List Models</button>
+  <div class="result" id="modelsResult"></div>
+</div>
+
+<!-- Voices -->
+<div class="card">
+  <h2><span class="method get">GET</span> /v1/voices</h2>
+  <div class="row">
+    <label>Model</label>
+    <select id="voicesModel" class="flex-1">
+      <option value="">All models</option>
+    </select>
+    <button class="btn-primary" onclick="listVoices()">List Voices</button>
+  </div>
+  <div class="result" id="voicesResult"></div>
+</div>
+
+<!-- TTS -->
+<div class="card">
+  <h2><span class="method post">POST</span> /v1/audio/speech</h2>
+  <div class="row">
+    <label>Model</label>
+    <select id="ttsModel" class="flex-1" onchange="onTTSModelChange()">
+      <option value="tts-1">tts-1</option>
+    </select>
+  </div>
+  <div class="row">
+    <label>Voice</label>
+    <select id="ttsVoice" class="flex-1">
+      <option value="af_heart">af_heart</option>
+    </select>
+  </div>
+  <div class="row">
+    <label>Speed</label>
+    <input type="number" id="ttsSpeed" value="1.0" step="0.1" min="0.5" max="2.0" style="width:80px">
+    <label>Format</label>
+    <select id="ttsFormat">
+      <option value="aac" selected>aac</option>
+      <option value="wav">wav</option>
+      <option value="opus">opus</option>
+      <option value="flac">flac</option>
+      <option value="mp3">mp3</option>
+      <option value="pcm">pcm</option>
+    </select>
+  </div>
+  <div class="row">
+    <label>Text</label>
+    <textarea id="ttsText" rows="2" class="flex-1" placeholder="Enter text to synthesize...">Hello, welcome to OpenMeow!</textarea>
+  </div>
+  <button class="btn-primary" onclick="synthesize()">Synthesize</button>
+  <button class="btn-secondary" onclick="copyCurlTTS()">Copy cURL</button>
+  <div id="ttsAudioBox"></div>
+  <div class="result" id="ttsResult"></div>
+</div>
+
+<!-- ASR -->
+<div class="card">
+  <h2><span class="method post">POST</span> /v1/audio/transcriptions</h2>
+  <div class="row">
+    <label>Model</label>
+    <select id="asrModel" class="flex-1">
+      <option value="whisper-1">whisper-1</option>
+    </select>
+  </div>
+  <div class="row">
+    <label>Language</label>
+    <input type="text" id="asrLang" placeholder="(optional, e.g. en)" style="width:120px">
+    <label>Format</label>
+    <select id="asrFormat">
+      <option value="json">json</option>
+      <option value="text">text</option>
+      <option value="srt">srt</option>
+      <option value="vtt">vtt</option>
+      <option value="verbose_json">verbose_json</option>
+    </select>
+  </div>
+  <div class="row">
+    <label>File</label>
+    <input type="file" id="asrFile" accept="audio/*" class="flex-1">
+  </div>
+  <div class="row" style="gap:12px; margin-top:4px">
+    <button class="btn-primary" onclick="transcribe()">Transcribe</button>
+    <button class="btn-secondary" id="recordBtn" onclick="toggleRecord()">Record</button>
+    <span id="recordStatus" style="font-size:12px; color:#86868b;"></span>
+  </div>
+  <div class="result" id="asrResult"></div>
+</div>
+
+<script>
+function base() { return document.getElementById('baseUrl').value.replace(/\/+$/, ''); }
+
+function headers() {
+  var h = {};
+  var token = document.getElementById('authToken').value.trim();
+  if (token) h['Authorization'] = 'Bearer ' + token;
+  return h;
+}
+
+function showResult(id, text, isError) {
+  var el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'result show' + (isError ? ' error' : ' ok');
+}
+
+function clearSelect(sel) {
+  while (sel.firstChild) sel.removeChild(sel.firstChild);
+}
+
+function addOption(sel, value, text, disabled) {
+  var opt = document.createElement('option');
+  opt.value = value;
+  opt.textContent = text;
+  if (disabled) opt.disabled = true;
+  sel.appendChild(opt);
+}
+
+function setConnStatus(state) {
+  var el = document.getElementById('connStatus');
+  while (el.firstChild) el.removeChild(el.firstChild);
+  var dot = document.createElement('span');
+  dot.className = 'status-dot ' + state;
+  el.appendChild(dot);
+}
+
+async function api(method, path, opts) {
+  opts = opts || {};
+  var h = Object.assign({}, headers(), opts.headers || {});
+  var res = await fetch(base() + path, { method: method, headers: h, body: opts.body });
+  return res;
+}
+
+// --- Auto-populate models and voices ---
+
+var cachedModels = [];
+
+async function fetchModels() {
+  try {
+    setConnStatus('loading');
+    var res = await api('GET', '/v1/models');
+    var json = await res.json();
+    cachedModels = json.data || [];
+    setConnStatus('ok');
+    return cachedModels;
+  } catch (e) {
+    setConnStatus('err');
+    cachedModels = [];
+    return [];
+  }
+}
+
+function populateModelDropdowns(models) {
+  var ttsSelect = document.getElementById('ttsModel');
+  var asrSelect = document.getElementById('asrModel');
+  var voicesSelect = document.getElementById('voicesModel');
+
+  var ttsModels = models.filter(function(m) { return m.type === 'tts'; });
+  var asrModels = models.filter(function(m) { return m.type === 'asr'; });
+
+  var prevTTS = ttsSelect.value;
+  var prevASR = asrSelect.value;
+
+  // Populate TTS models
+  clearSelect(ttsSelect);
+  if (ttsModels.length) {
+    ttsModels.forEach(function(m) {
+      addOption(ttsSelect, m.id, m.id + (m.ready ? '' : ' (loading...)'), !m.ready);
+    });
+  } else {
+    addOption(ttsSelect, 'tts-1', 'tts-1 (fallback)');
+  }
+  if (prevTTS && ttsSelect.querySelector('option[value="' + CSS.escape(prevTTS) + '"]')) {
+    ttsSelect.value = prevTTS;
+  }
+
+  // Populate ASR models
+  clearSelect(asrSelect);
+  if (asrModels.length) {
+    asrModels.forEach(function(m) {
+      addOption(asrSelect, m.id, m.id + (m.ready ? '' : ' (loading...)'), !m.ready);
+    });
+  } else {
+    addOption(asrSelect, 'whisper-1', 'whisper-1 (fallback)');
+  }
+  if (prevASR && asrSelect.querySelector('option[value="' + CSS.escape(prevASR) + '"]')) {
+    asrSelect.value = prevASR;
+  }
+
+  // Populate Voices card model selector
+  clearSelect(voicesSelect);
+  addOption(voicesSelect, '', 'All models');
+  ttsModels.forEach(function(m) {
+    addOption(voicesSelect, m.id, m.id);
+  });
+
+  onTTSModelChange();
+}
+
+async function fetchVoicesForModel(modelId) {
+  try {
+    var q = modelId ? '?model=' + encodeURIComponent(modelId) : '';
+    var res = await api('GET', '/v1/voices' + q);
+    var json = await res.json();
+    return json.voices || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+async function onTTSModelChange() {
+  var modelId = document.getElementById('ttsModel').value;
+  var voiceSelect = document.getElementById('ttsVoice');
+  var prevVoice = voiceSelect.value;
+
+  clearSelect(voiceSelect);
+  addOption(voiceSelect, '', 'Loading voices...');
+  voiceSelect.disabled = true;
+
+  var voices = await fetchVoicesForModel(modelId);
+
+  clearSelect(voiceSelect);
+  voiceSelect.disabled = false;
+
+  if (voices.length) {
+    voices.forEach(function(v) {
+      var label = v.id;
+      if (v.name && v.name !== v.id) label += ' (' + v.name + ')';
+      if (v.language) label += ' [' + v.language + ']';
+      addOption(voiceSelect, v.id, label);
+    });
+    if (prevVoice && voiceSelect.querySelector('option[value="' + CSS.escape(prevVoice) + '"]')) {
+      voiceSelect.value = prevVoice;
+    }
+  } else {
+    addOption(voiceSelect, 'af_heart', 'af_heart (fallback)');
+  }
+}
+
+async function refreshAll() {
+  var models = await fetchModels();
+  populateModelDropdowns(models);
+}
+
+// Auto-fetch on page load
+window.addEventListener('DOMContentLoaded', function() {
+  refreshAll();
+});
+
+// --- API Functions ---
+
+// Health
+async function checkHealth() {
+  try {
+    var res = await api('GET', '/health');
+    var text = await res.text();
+    showResult('healthResult', res.status + ' ' + res.statusText + '\n' + text, !res.ok);
+  } catch (e) { showResult('healthResult', 'Connection failed: ' + e.message, true); }
+}
+
+// Models
+async function listModels() {
+  try {
+    var res = await api('GET', '/v1/models');
+    var json = await res.json();
+    showResult('modelsResult', JSON.stringify(json, null, 2), !res.ok);
+  } catch (e) { showResult('modelsResult', 'Error: ' + e.message, true); }
+}
+
+// Voices
+async function listVoices() {
+  try {
+    var model = document.getElementById('voicesModel').value;
+    var q = model ? '?model=' + encodeURIComponent(model) : '';
+    var res = await api('GET', '/v1/voices' + q);
+    var json = await res.json();
+    showResult('voicesResult', JSON.stringify(json, null, 2), !res.ok);
+  } catch (e) { showResult('voicesResult', 'Error: ' + e.message, true); }
+}
+
+// TTS
+async function synthesize() {
+  var body = {
+    model: document.getElementById('ttsModel').value,
+    input: document.getElementById('ttsText').value,
+    voice: document.getElementById('ttsVoice').value,
+    speed: parseFloat(document.getElementById('ttsSpeed').value),
+    response_format: document.getElementById('ttsFormat').value
+  };
+  try {
+    showResult('ttsResult', 'Generating...', false);
+    var res = await api('POST', '/v1/audio/speech', {
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      var errText = await res.text();
+      showResult('ttsResult', res.status + ' ' + errText, true);
+      return;
+    }
+    var blob = await res.blob();
+    var url = URL.createObjectURL(blob);
+    var box = document.getElementById('ttsAudioBox');
+    while (box.firstChild) box.removeChild(box.firstChild);
+    var audio = document.createElement('audio');
+    audio.controls = true;
+    audio.autoplay = true;
+    audio.src = url;
+    box.appendChild(audio);
+    showResult('ttsResult', 'OK - ' + blob.size + ' bytes, ' + blob.type, false);
+  } catch (e) { showResult('ttsResult', 'Error: ' + e.message, true); }
+}
+
+function copyCurlTTS() {
+  var b = base();
+  var token = document.getElementById('authToken').value.trim();
+  var auth = token ? '\n  -H "Authorization: Bearer ' + token + '" \\' : '';
+  var body = {
+    model: document.getElementById('ttsModel').value,
+    input: document.getElementById('ttsText').value,
+    voice: document.getElementById('ttsVoice').value,
+    speed: parseFloat(document.getElementById('ttsSpeed').value),
+    response_format: document.getElementById('ttsFormat').value
+  };
+  var cmd = 'curl ' + b + '/v1/audio/speech \\' + auth +
+    '\n  -H "Content-Type: application/json" \\' +
+    "\n  -d '" + JSON.stringify(body) + "' \\" +
+    '\n  --output speech.' + body.response_format;
+  navigator.clipboard.writeText(cmd);
+  showResult('ttsResult', 'cURL copied to clipboard:\n\n' + cmd, false);
+}
+
+// ASR
+async function transcribe() {
+  var fileInput = document.getElementById('asrFile');
+  if (!fileInput.files.length) {
+    showResult('asrResult', 'Please select an audio file or use Record.', true);
+    return;
+  }
+  await doTranscribe(fileInput.files[0]);
+}
+
+async function doTranscribe(file) {
+  var form = new FormData();
+  form.append('file', file);
+  form.append('model', document.getElementById('asrModel').value);
+  var lang = document.getElementById('asrLang').value.trim();
+  if (lang) form.append('language', lang);
+  form.append('response_format', document.getElementById('asrFormat').value);
+  try {
+    showResult('asrResult', 'Transcribing...', false);
+    var res = await api('POST', '/v1/audio/transcriptions', { body: form });
+    var text = await res.text();
+    try {
+      showResult('asrResult', JSON.stringify(JSON.parse(text), null, 2), !res.ok);
+    } catch (_e) {
+      showResult('asrResult', text, !res.ok);
+    }
+  } catch (e) { showResult('asrResult', 'Error: ' + e.message, true); }
+}
+
+// Recording
+var mediaRecorder = null;
+var audioChunks = [];
+
+function toggleRecord() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    document.getElementById('recordBtn').textContent = 'Record';
+    document.getElementById('recordStatus').textContent = 'Processing...';
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    mediaRecorder.ondataavailable = function(e) { audioChunks.push(e.data); };
+    mediaRecorder.onstop = function() {
+      stream.getTracks().forEach(function(t) { t.stop(); });
+      var blob = new Blob(audioChunks, { type: 'audio/webm' });
+      var file = new File([blob], 'recording.webm', { type: 'audio/webm' });
+      document.getElementById('recordStatus').textContent = 'Recorded ' + (blob.size / 1024).toFixed(1) + ' KB';
+      doTranscribe(file);
+    };
+    mediaRecorder.start();
+    document.getElementById('recordBtn').textContent = 'Stop';
+    document.getElementById('recordStatus').textContent = 'Recording...';
+  }).catch(function(e) {
+    showResult('asrResult', 'Microphone access denied: ' + e.message, true);
+  });
+}
+</script>
+</body>
+</html>
