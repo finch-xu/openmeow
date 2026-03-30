@@ -5,7 +5,7 @@ struct APISettingsView: View {
     @AppStorage("listenAddress") private var listenAddress = "127.0.0.1"
     @AppStorage("serverPort") private var port = 23333
     @AppStorage(AppConstants.authEnabledKey) private var authEnabled = false
-    @State private var authToken = ""
+    @AppStorage(AppConstants.authTokenKey) private var authToken = ""
     @AppStorage(AppConstants.corsEnabledKey) private var corsEnabled = true
     @AppStorage(AppConstants.defaultTTSFormatKey) private var defaultTTSFormat = "opus"
 
@@ -30,9 +30,6 @@ struct APISettingsView: View {
         }
         .onAppear {
             loadCorsOrigins()
-            // Migrate token from UserDefaults to Keychain on first launch
-            KeychainHelper.migrateFromUserDefaults(key: AppConstants.authTokenKey)
-            authToken = KeychainHelper.load(key: AppConstants.authTokenKey) ?? ""
         }
     }
 
@@ -163,18 +160,11 @@ struct APISettingsView: View {
                             .frame(width: 50, alignment: .trailing)
                             .foregroundStyle(.secondary)
                             .font(.caption)
-                        SecureField("sk-...", text: Binding(
-                            get: { authToken },
-                            set: { newValue in
-                                authToken = newValue
-                                KeychainHelper.save(key: AppConstants.authTokenKey, value: newValue)
-                            }
-                        ))
+                        TextField("sk-...", text: $authToken)
                             .textFieldStyle(.roundedBorder)
                             .font(.system(.caption, design: .monospaced))
                         Button {
                             authToken = generateToken()
-                            KeychainHelper.save(key: AppConstants.authTokenKey, value: authToken)
                         } label: {
                             Image(systemName: "arrow.triangle.2.circlepath")
                                 .help("Generate random token")

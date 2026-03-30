@@ -324,7 +324,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = openmeow/openmeow.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = WD4L9846K7;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -335,6 +335,8 @@
 					"$(PROJECT_DIR)/../Frameworks/opus.xcframework/macos-arm64_x86_64/Headers",
 					"$(PROJECT_DIR)/../Frameworks/lame.xcframework/macos-arm64/Headers",
 				);
+				INFOPLIST_KEY_CFBundleDisplayName = OpenMeow;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "OpenMeow needs microphone access for speech recognition testing.";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
@@ -344,7 +346,7 @@
 					"$(PROJECT_DIR)/../Frameworks/lame.xcframework/macos-arm64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				OTHER_LDFLAGS = (
 					"-lsherpa-onnx",
 					"-lonnxruntime",
@@ -375,7 +377,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = openmeow/openmeow.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = WD4L9846K7;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -386,6 +388,8 @@
 					"$(PROJECT_DIR)/../Frameworks/opus.xcframework/macos-arm64_x86_64/Headers",
 					"$(PROJECT_DIR)/../Frameworks/lame.xcframework/macos-arm64/Headers",
 				);
+				INFOPLIST_KEY_CFBundleDisplayName = OpenMeow;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "OpenMeow needs microphone access for speech recognition testing.";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
@@ -395,7 +399,7 @@
 					"$(PROJECT_DIR)/../Frameworks/lame.xcframework/macos-arm64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				OTHER_LDFLAGS = (
 					"-lsherpa-onnx",
 					"-lonnxruntime",

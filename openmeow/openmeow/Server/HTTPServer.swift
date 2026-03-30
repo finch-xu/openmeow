@@ -132,7 +132,7 @@ nonisolated enum HTTPServer {
     /// Check bearer token auth. Returns an error Response if unauthorized, nil if OK.
     static func checkAuth(_ request: Request) -> Response? {
         guard UserDefaults.standard.bool(forKey: AppConstants.authEnabledKey) else { return nil }
-        guard let savedToken = KeychainHelper.load(key: AppConstants.authTokenKey),
+        guard let savedToken = UserDefaults.standard.string(forKey: AppConstants.authTokenKey),
               !savedToken.isEmpty else { return nil }
 
         if let authHeader = request.headers[.authorization] {
