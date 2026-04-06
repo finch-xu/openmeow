@@ -5,7 +5,7 @@
 <h1 align="center">OpenMeow</h1>
 
 <p align="center">
-  原生 macOS 菜单栏应用，提供本地 TTS/ASR 语音服务，兼容 OpenAI API。
+  原生 macOS 菜单栏应用，提供本地 &amp; 云端 TTS/ASR 语音服务，兼容 OpenAI API。
 </p>
 
 <p align="center">
@@ -37,10 +37,11 @@
 - **菜单栏应用** — 在 macOS 后台静默运行（Apple Silicon）
 - **OpenAI 兼容 API** — 可直接替换 `/v1/audio/speech` 和 `/v1/audio/transcriptions`
 - **多引擎支持** — sherpa-onnx、WhisperKit、speech-swift（Qwen3-TTS/ASR）
+- **云端 TTS** — 支持 OpenAI 兼容服务、MiMo、Qwen3 TTS Flash（DashScope），40+ 音色
 - **音频格式** — WAV、MP3、Opus（OGG/WebM）、PCM、FLAC、AAC
 - **模型商店** — 内置模型注册表，一键下载管理
 - **接入 OpenClaw** — 一行配置即可让 [OpenClaw](https://github.com/openclaw/openclaw) 获得本地语音能力
-- **隐私优先** — 所有处理在本地完成，数据不会离开你的设备
+- **隐私优先** — 本地模型数据不离开设备；云端模型按需启用
 
 ## 系统要求
 
@@ -129,7 +130,7 @@ OpenMeow 的 API 与 OpenAI 完全兼容，[OpenClaw](https://github.com/opencla
 
 ## 模型
 
-### 语音合成（TTS）
+### 语音合成（TTS）— 本地
 
 | 模型 | 大小 | 语言 |
 |------|------|------|
@@ -138,6 +139,14 @@ OpenMeow 的 API 与 OpenAI 完全兼容，[OpenClaw](https://github.com/opencla
 | Kitten Mini v0.1 | 18 MB | 英文 |
 | Qwen3-TTS 0.6B (MLX) | 1.7 GB | 多语言 |
 | Qwen3-TTS 1.7B (MLX) | 3.2 GB | 多语言 |
+
+### 语音合成（TTS）— 云端
+
+| 模型 | 服务商 | 音色 | 语言 |
+|------|--------|------|------|
+| OpenAI TTS（云端）| OpenAI / 兼容服务 | 6 个 | 14 种语言 |
+| MiMo TTS v2（云端）| 小米 MiMo | 3 个 | 中文、英文 |
+| Qwen3 TTS Flash（云端）| 阿里云 DashScope | 44 个 | 10 种语言（含中文方言）|
 
 ### 语音识别（ASR）
 

@@ -5,7 +5,7 @@
 <h1 align="center">OpenMeow</h1>
 
 <p align="center">
-  A native macOS menu bar app providing local TTS/ASR services via an OpenAI-compatible API.
+  A native macOS menu bar app providing local & cloud TTS/ASR services via an OpenAI-compatible API.
 </p>
 
 <p align="center">
@@ -37,10 +37,11 @@
 - **Menu bar app** — runs quietly in the background on macOS (Apple Silicon)
 - **OpenAI-compatible API** — drop-in replacement for `/v1/audio/speech` and `/v1/audio/transcriptions`
 - **Multiple engines** — sherpa-onnx, WhisperKit, speech-swift (Qwen3-TTS/ASR)
+- **Cloud TTS** — OpenAI-compatible, MiMo, and Qwen3 TTS Flash (DashScope) with 40+ voices
 - **Audio format support** — WAV, MP3, Opus (OGG/WebM), PCM, FLAC, AAC
 - **Model store** — download and manage models from the built-in registry
 - **Works with OpenClaw** — give [OpenClaw](https://github.com/openclaw/openclaw) local voice capabilities in one line of config
-- **Privacy first** — everything runs locally, no data leaves your machine
+- **Privacy first** — local models keep data on your machine; cloud models are opt-in
 
 ## Requirements
 
@@ -129,7 +130,7 @@ OpenMeow speaks the same API as OpenAI, so [OpenClaw](https://github.com/opencla
 
 ## Models
 
-### TTS
+### TTS — Local
 
 | Model | Size | Languages |
 |-------|------|-----------|
@@ -138,6 +139,14 @@ OpenMeow speaks the same API as OpenAI, so [OpenClaw](https://github.com/opencla
 | Kitten Mini v0.1 | 18 MB | English |
 | Qwen3-TTS 0.6B (MLX) | 1.7 GB | Multilingual |
 | Qwen3-TTS 1.7B (MLX) | 3.2 GB | Multilingual |
+
+### TTS — Cloud
+
+| Model | Provider | Voices | Languages |
+|-------|----------|--------|-----------|
+| OpenAI TTS (Cloud) | OpenAI / compatible | 6 | 14 languages |
+| MiMo TTS v2 (Cloud) | Xiaomi MiMo | 3 | Chinese, English |
+| Qwen3 TTS Flash (Cloud) | Alibaba DashScope | 44 | 10 languages (incl. Chinese dialects) |
 
 ### ASR
 
