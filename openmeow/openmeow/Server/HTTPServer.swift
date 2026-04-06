@@ -14,6 +14,7 @@ nonisolated enum HTTPServer {
         router.on("v1/voices", method: .options) { r, _ in corsResponse(for: r, status: .noContent) }
         router.on("v1/audio/speech", method: .options) { r, _ in corsResponse(for: r, status: .noContent) }
         router.on("v1/audio/transcriptions", method: .options) { r, _ in corsResponse(for: r, status: .noContent) }
+        router.on("v1/chat/completions", method: .options) { r, _ in corsResponse(for: r, status: .noContent) }
 
         // Register all routes
         HealthRoute.register(on: router)
@@ -21,6 +22,7 @@ nonisolated enum HTTPServer {
         ASRRoute.register(on: router, providerRouter: providerRouter)
         ModelsRoute.register(on: router, providerRouter: providerRouter)
         VoicesRoute.register(on: router, providerRouter: providerRouter)
+        ChatCompletionsRoute.register(on: router, providerRouter: providerRouter)
 
         let app = Application(
             router: router,
