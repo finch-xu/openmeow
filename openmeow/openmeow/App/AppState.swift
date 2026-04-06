@@ -240,6 +240,13 @@ final class AppState {
                         authPrefix: authPrefix, voices: voices
                     )
                     await providerRouter.registerTTS(provider, for: modelID)
+                } else if entry.engine == .qwenCloud {
+                    let provider = QwenCloudTTS(
+                        modelID: modelID, endpoint: endpoint, cloudModel: cloudModel,
+                        apiKeySettingsKey: keySettingsKey, authHeader: authHeader,
+                        authPrefix: authPrefix, voices: voices
+                    )
+                    await providerRouter.registerTTS(provider, for: modelID)
                 }
 
                 await modelManager.setModelRunning(modelID)
@@ -300,7 +307,7 @@ final class AppState {
             case .speechSwift:
                 break // handled above
 
-            case .openaiCloud, .mimoCloud:
+            case .openaiCloud, .mimoCloud, .qwenCloud:
                 break // handled above (cloud early return)
             }
 

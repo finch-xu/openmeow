@@ -57,10 +57,11 @@ nonisolated enum EngineType: String, Codable, Sendable {
     case whisperKit = "whisper-kit"
     case openaiCloud = "openai-cloud"
     case mimoCloud = "mimo-cloud"
+    case qwenCloud = "qwen-cloud"
 
     var isCloud: Bool {
         switch self {
-        case .openaiCloud, .mimoCloud: true
+        case .openaiCloud, .mimoCloud, .qwenCloud: true
         default: false
         }
     }
