@@ -37,9 +37,9 @@ nonisolated enum AudioEncoder {
             )
             #endif
         case .aac:
-            return try encodeCompressed(buffer, fileType: .m4a, formatID: kAudioFormatMPEG4AAC)
+            return try encodeAAC(buffer)
         case .flac:
-            return try encodeCompressed(buffer, fileType: AVFileType(rawValue: "public.flac"), formatID: kAudioFormatFLAC)
+            return try encodeFLAC(buffer)
         case .opus:
             #if OPUS_AVAILABLE
             return try OggOpusEncoder.encode(buffer)
@@ -99,21 +99,25 @@ nonisolated enum AudioEncoder {
         }
     }
 
-    // MARK: - Compressed Encoding (AAC, FLAC via AVFoundation)
+    // MARK: - AAC Encoding (M4A container)
 
-    private static func encodeCompressed(
-        _ buffer: AudioBuffer,
-        fileType: AVFileType,
-        formatID: AudioFormatID
-    ) throws -> Data {
-        let sampleRate = Double(buffer.sampleRate)
+    private static func encodeAAC(_ buffer: AudioBuffer) throws -> Data {
+        // Try at native sample rate first; fall back to 48kHz if the encoder rejects it
+        if let data = try? encodeAACAtRate(buffer, sampleRate: Double(buffer.sampleRate)) {
+            return data
+        }
+        let resampled = AudioBuffer(
+            samples: AudioResampler.resample(buffer.samples, from: buffer.sampleRate, to: 48000),
+            sampleRate: 48000
+        )
+        return try encodeAACAtRate(resampled, sampleRate: 48000)
+    }
+
+    private static func encodeAACAtRate(_ buffer: AudioBuffer, sampleRate: Double) throws -> Data {
         let frameCount = AVAudioFrameCount(buffer.samples.count)
 
         guard let inputFormat = AVAudioFormat(
-            commonFormat: .pcmFormatFloat32,
-            sampleRate: sampleRate,
-            channels: 1,
-            interleaved: false
+            commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, channels: 1, interleaved: false
         ) else {
             throw AudioEncoderError.encodingFailed("Cannot create input format")
         }
@@ -122,46 +126,76 @@ nonisolated enum AudioEncoder {
             throw AudioEncoderError.encodingFailed("Cannot create input buffer")
         }
         inputBuffer.frameLength = frameCount
-
-        if let channelData = inputBuffer.floatChannelData {
-            buffer.samples.withUnsafeBufferPointer { src in
-                channelData[0].initialize(from: src.baseAddress!, count: Int(frameCount))
-            }
+        buffer.samples.withUnsafeBufferPointer { src in
+            inputBuffer.floatChannelData![0].initialize(from: src.baseAddress!, count: Int(frameCount))
         }
 
-        let ext = fileType.rawValue.contains("flac") ? "flac" : "m4a"
         let tempURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
-            .appendingPathExtension(ext)
-
+            .appendingPathExtension("m4a")
         defer { try? FileManager.default.removeItem(at: tempURL) }
 
-        var outputSettings: [String: Any] = [
-            AVFormatIDKey: formatID,
+        // Let Core Audio pick a valid bitrate -- do NOT hardcode AVEncoderBitRateKey
+        let outputSettings: [String: Any] = [
+            AVFormatIDKey: kAudioFormatMPEG4AAC,
             AVSampleRateKey: sampleRate,
             AVNumberOfChannelsKey: 1,
         ]
 
-        if formatID == kAudioFormatMPEG4AAC {
-            outputSettings[AVEncoderBitRateKey] = 128000
-        }
-
-        let outputFile: AVAudioFile
+        // Inner scope ensures AVAudioFile is deallocated (and the container finalized) before reading
         do {
-            outputFile = try AVAudioFile(
+            let outputFile = try AVAudioFile(
                 forWriting: tempURL,
                 settings: outputSettings,
                 commonFormat: .pcmFormatFloat32,
                 interleaved: false
             )
-        } catch {
-            throw AudioEncoderError.encodingFailed(
-                "Format \(formatID) not available: \(error.localizedDescription)"
-            )
+            try outputFile.write(from: inputBuffer)
+        }
+        return try Data(contentsOf: tempURL)
+    }
+
+    // MARK: - FLAC Encoding (CAF container)
+
+    private static func encodeFLAC(_ buffer: AudioBuffer) throws -> Data {
+        let sampleRate = Double(buffer.sampleRate)
+        let frameCount = AVAudioFrameCount(buffer.samples.count)
+
+        guard let inputFormat = AVAudioFormat(
+            commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, channels: 1, interleaved: false
+        ) else {
+            throw AudioEncoderError.encodingFailed("Cannot create input format")
         }
 
-        try outputFile.write(from: inputBuffer)
+        guard let inputBuffer = AVAudioPCMBuffer(pcmFormat: inputFormat, frameCapacity: frameCount) else {
+            throw AudioEncoderError.encodingFailed("Cannot create input buffer")
+        }
+        inputBuffer.frameLength = frameCount
+        buffer.samples.withUnsafeBufferPointer { src in
+            inputBuffer.floatChannelData![0].initialize(from: src.baseAddress!, count: Int(frameCount))
+        }
 
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension("caf")
+        defer { try? FileManager.default.removeItem(at: tempURL) }
+
+        let outputSettings: [String: Any] = [
+            AVFormatIDKey: kAudioFormatFLAC,
+            AVSampleRateKey: sampleRate,
+            AVNumberOfChannelsKey: 1,
+        ]
+
+        // Inner scope ensures AVAudioFile is deallocated (and the container finalized) before reading
+        do {
+            let outputFile = try AVAudioFile(
+                forWriting: tempURL,
+                settings: outputSettings,
+                commonFormat: .pcmFormatFloat32,
+                interleaved: false
+            )
+            try outputFile.write(from: inputBuffer)
+        }
         return try Data(contentsOf: tempURL)
     }
 
