@@ -473,6 +473,7 @@ struct APISettingsView: View {
         case .sherpaOnnx: ("ONNX", .orange)
         case .speechSwift: ("MLX", .purple)
         case .whisperKit: ("CoreML", .cyan)
+        case .openaiCloud, .mimoCloud: ("Cloud", .indigo)
         }
         return Text(text)
             .font(.system(size: 9, weight: .semibold, design: .monospaced))

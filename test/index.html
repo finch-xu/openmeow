@@ -119,6 +119,76 @@
   <div class="result" id="ttsResult"></div>
 </div>
 
+<!-- Cloud TTS -->
+<div class="card">
+  <h2><span class="method post">POST</span> /v1/audio/speech <span style="font-size:11px; color:#86868b; font-weight:normal;">— Cloud TTS</span></h2>
+  <div class="row">
+    <label>Model</label>
+    <select id="cloudTTSModel" class="flex-1" onchange="onCloudTTSModelChange()"></select>
+  </div>
+  <div class="row">
+    <label>Voice</label>
+    <select id="cloudTTSVoice" class="flex-1"></select>
+  </div>
+  <div class="row">
+    <label>Speed</label>
+    <input type="number" id="cloudTTSSpeed" value="1.0" step="0.1" min="0.5" max="2.0" style="width:80px">
+    <label>Format</label>
+    <select id="cloudTTSFormat">
+      <option value="aac" selected>aac</option>
+      <option value="wav">wav</option>
+      <option value="opus">opus</option>
+      <option value="flac">flac</option>
+      <option value="mp3">mp3</option>
+      <option value="pcm">pcm</option>
+    </select>
+  </div>
+  <div class="row">
+    <label>Text</label>
+    <textarea id="cloudTTSText" rows="2" class="flex-1" placeholder="输入要合成的文本...">你好，欢迎使用 OpenMeow！</textarea>
+  </div>
+  <button class="btn-primary" onclick="cloudSynthesize()">Synthesize</button>
+  <button class="btn-secondary" onclick="copyCurlCloudTTS()">Copy cURL</button>
+  <div id="cloudTTSAudioBox"></div>
+  <div class="result" id="cloudTTSResult"></div>
+</div>
+
+<!-- Chat TTS (chat/completions style) -->
+<div class="card">
+  <h2><span class="method post">POST</span> /v1/chat/completions <span style="font-size:11px; color:#86868b; font-weight:normal;">— Chat TTS</span></h2>
+  <div class="row">
+    <label>Model</label>
+    <select id="chatTTSModel" class="flex-1" onchange="onChatTTSModelChange()"></select>
+  </div>
+  <div class="row">
+    <label>Voice</label>
+    <select id="chatTTSVoice" class="flex-1"></select>
+  </div>
+  <div class="row">
+    <label>Format</label>
+    <select id="chatTTSAudioFmt">
+      <option value="wav" selected>wav</option>
+      <option value="aac">aac</option>
+      <option value="opus">opus</option>
+      <option value="flac">flac</option>
+      <option value="mp3">mp3</option>
+      <option value="pcm">pcm</option>
+    </select>
+  </div>
+  <div class="row">
+    <label>Text</label>
+    <textarea id="chatTTSText" rows="2" class="flex-1" placeholder="合成文本（assistant 角色）">你好，欢迎使用 OpenMeow！</textarea>
+  </div>
+  <div class="row">
+    <label>Context</label>
+    <input type="text" id="chatTTSContext" placeholder="(可选) user 角色上下文" class="flex-1">
+  </div>
+  <button class="btn-primary" onclick="chatSynthesize()">Synthesize</button>
+  <button class="btn-secondary" onclick="copyCurlChatTTS()">Copy cURL</button>
+  <div id="chatTTSAudioBox"></div>
+  <div class="result" id="chatTTSResult"></div>
+</div>
+
 <!-- ASR -->
 <div class="card">
   <h2><span class="method post">POST</span> /v1/audio/transcriptions</h2>
@@ -259,6 +329,8 @@ function populateModelDropdowns(models) {
   });
 
   onTTSModelChange();
+  populateCloudTTSDropdown(models);
+  populateChatTTSDropdown(models);
 }
 
 async function fetchVoicesForModel(modelId) {
@@ -421,6 +493,224 @@ async function doTranscribe(file) {
       showResult('asrResult', text, !res.ok);
     }
   } catch (e) { showResult('asrResult', 'Error: ' + e.message, true); }
+}
+
+// Cloud TTS (via OpenMeow /v1/audio/speech)
+function populateCloudTTSDropdown(models) {
+  var sel = document.getElementById('cloudTTSModel');
+  var prev = sel.value;
+  clearSelect(sel);
+  var cloudModels = models.filter(function(m) { return m.type === 'tts' && (m.id.indexOf('cloud') !== -1 || m.id.indexOf('mimo') !== -1); });
+  if (cloudModels.length === 0) {
+    // Fallback: show all TTS models, let user pick
+    cloudModels = models.filter(function(m) { return m.type === 'tts'; });
+  }
+  if (cloudModels.length) {
+    cloudModels.forEach(function(m) {
+      addOption(sel, m.id, m.id + (m.ready ? '' : ' (loading...)'), !m.ready);
+    });
+  } else {
+    addOption(sel, 'mimo-v2-tts', 'mimo-v2-tts (not loaded)');
+    addOption(sel, 'openai-cloud-tts', 'openai-cloud-tts (not loaded)');
+  }
+  if (prev && sel.querySelector('option[value="' + CSS.escape(prev) + '"]')) {
+    sel.value = prev;
+  }
+  onCloudTTSModelChange();
+}
+
+async function onCloudTTSModelChange() {
+  var modelId = document.getElementById('cloudTTSModel').value;
+  var voiceSelect = document.getElementById('cloudTTSVoice');
+  var prevVoice = voiceSelect.value;
+  clearSelect(voiceSelect);
+  addOption(voiceSelect, '', 'Loading...');
+  voiceSelect.disabled = true;
+  var voices = await fetchVoicesForModel(modelId);
+  clearSelect(voiceSelect);
+  voiceSelect.disabled = false;
+  if (voices.length) {
+    voices.forEach(function(v) {
+      var label = v.id;
+      if (v.name && v.name !== v.id) label += ' (' + v.name + ')';
+      if (v.language) label += ' [' + v.language + ']';
+      addOption(voiceSelect, v.id, label);
+    });
+    if (prevVoice && voiceSelect.querySelector('option[value="' + CSS.escape(prevVoice) + '"]')) {
+      voiceSelect.value = prevVoice;
+    }
+  } else {
+    addOption(voiceSelect, 'mimo_default', 'mimo_default (fallback)');
+  }
+}
+
+async function cloudSynthesize() {
+  var body = {
+    model: document.getElementById('cloudTTSModel').value,
+    input: document.getElementById('cloudTTSText').value,
+    voice: document.getElementById('cloudTTSVoice').value,
+    speed: parseFloat(document.getElementById('cloudTTSSpeed').value),
+    response_format: document.getElementById('cloudTTSFormat').value
+  };
+  try {
+    showResult('cloudTTSResult', 'Generating...', false);
+    var res = await api('POST', '/v1/audio/speech', {
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      var errText = await res.text();
+      showResult('cloudTTSResult', res.status + ' ' + errText, true);
+      return;
+    }
+    var blob = await res.blob();
+    var url = URL.createObjectURL(blob);
+    var box = document.getElementById('cloudTTSAudioBox');
+    while (box.firstChild) box.removeChild(box.firstChild);
+    var audio = document.createElement('audio');
+    audio.controls = true;
+    audio.autoplay = true;
+    audio.src = url;
+    box.appendChild(audio);
+    showResult('cloudTTSResult', 'OK - ' + blob.size + ' bytes, ' + blob.type, false);
+  } catch (e) { showResult('cloudTTSResult', 'Error: ' + e.message, true); }
+}
+
+function copyCurlCloudTTS() {
+  var b = base();
+  var token = document.getElementById('authToken').value.trim();
+  var auth = token ? '\n  -H "Authorization: Bearer ' + token + '" \\' : '';
+  var body = {
+    model: document.getElementById('cloudTTSModel').value,
+    input: document.getElementById('cloudTTSText').value,
+    voice: document.getElementById('cloudTTSVoice').value,
+    speed: parseFloat(document.getElementById('cloudTTSSpeed').value),
+    response_format: document.getElementById('cloudTTSFormat').value
+  };
+  var cmd = 'curl ' + b + '/v1/audio/speech \\' + auth +
+    '\n  -H "Content-Type: application/json" \\' +
+    "\n  -d '" + JSON.stringify(body) + "' \\" +
+    '\n  --output speech.' + body.response_format;
+  navigator.clipboard.writeText(cmd);
+  showResult('cloudTTSResult', 'cURL copied to clipboard:\n\n' + cmd, false);
+}
+
+// Chat TTS (via OpenMeow /v1/chat/completions)
+function populateChatTTSDropdown(models) {
+  var sel = document.getElementById('chatTTSModel');
+  var prev = sel.value;
+  clearSelect(sel);
+  var ttsModels = models.filter(function(m) { return m.type === 'tts' && m.ready; });
+  if (ttsModels.length) {
+    ttsModels.forEach(function(m) { addOption(sel, m.id, m.id); });
+  } else {
+    addOption(sel, 'tts-1', 'tts-1 (fallback)');
+  }
+  if (prev && sel.querySelector('option[value="' + CSS.escape(prev) + '"]')) {
+    sel.value = prev;
+  }
+  onChatTTSModelChange();
+}
+
+async function onChatTTSModelChange() {
+  var modelId = document.getElementById('chatTTSModel').value;
+  var voiceSelect = document.getElementById('chatTTSVoice');
+  var prevVoice = voiceSelect.value;
+  clearSelect(voiceSelect);
+  addOption(voiceSelect, '', 'Loading...');
+  voiceSelect.disabled = true;
+  var voices = await fetchVoicesForModel(modelId);
+  clearSelect(voiceSelect);
+  voiceSelect.disabled = false;
+  if (voices.length) {
+    voices.forEach(function(v) {
+      var label = v.id;
+      if (v.name && v.name !== v.id) label += ' (' + v.name + ')';
+      if (v.language) label += ' [' + v.language + ']';
+      addOption(voiceSelect, v.id, label);
+    });
+    if (prevVoice && voiceSelect.querySelector('option[value="' + CSS.escape(prevVoice) + '"]')) {
+      voiceSelect.value = prevVoice;
+    }
+  } else {
+    addOption(voiceSelect, 'af_heart', 'af_heart (fallback)');
+  }
+}
+
+async function chatSynthesize() {
+  var model = document.getElementById('chatTTSModel').value;
+  var voice = document.getElementById('chatTTSVoice').value;
+  var format = document.getElementById('chatTTSAudioFmt').value;
+  var text = document.getElementById('chatTTSText').value;
+  var context = document.getElementById('chatTTSContext').value.trim();
+
+  if (!text) { showResult('chatTTSResult', 'Please enter text to synthesize.', true); return; }
+
+  var messages = [];
+  if (context) messages.push({ role: 'user', content: context });
+  messages.push({ role: 'assistant', content: text });
+
+  var body = { model: model, messages: messages, audio: { format: format, voice: voice } };
+
+  try {
+    showResult('chatTTSResult', 'Generating...', false);
+    var res = await api('POST', '/v1/chat/completions', {
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      var errText = await res.text();
+      showResult('chatTTSResult', res.status + ' ' + errText, true);
+      return;
+    }
+    var json = await res.json();
+    var audioData;
+    try { audioData = json.choices[0].message.audio.data; }
+    catch (e) {
+      showResult('chatTTSResult', 'Unexpected response:\n' + JSON.stringify(json, null, 2), true);
+      return;
+    }
+
+    var raw = atob(audioData);
+    var bytes = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+
+    var mimeTypes = { wav: 'audio/wav', aac: 'audio/aac', opus: 'audio/opus', flac: 'audio/flac', mp3: 'audio/mpeg', pcm: 'audio/pcm' };
+    var blob = new Blob([bytes], { type: mimeTypes[format] || 'audio/wav' });
+
+    var box = document.getElementById('chatTTSAudioBox');
+    while (box.firstChild) box.removeChild(box.firstChild);
+    var audio = document.createElement('audio');
+    audio.controls = true; audio.autoplay = true;
+    audio.src = URL.createObjectURL(blob);
+    box.appendChild(audio);
+
+    var info = 'OK - ' + blob.size + ' bytes (' + format + ')';
+    if (json.usage) info += '\nUsage: ' + JSON.stringify(json.usage);
+    showResult('chatTTSResult', info, false);
+  } catch (e) { showResult('chatTTSResult', 'Error: ' + e.message, true); }
+}
+
+function copyCurlChatTTS() {
+  var b = base();
+  var token = document.getElementById('authToken').value.trim();
+  var auth = token ? '\n  -H "Authorization: Bearer ' + token + '" \\' : '';
+  var model = document.getElementById('chatTTSModel').value;
+  var voice = document.getElementById('chatTTSVoice').value;
+  var format = document.getElementById('chatTTSAudioFmt').value;
+  var text = document.getElementById('chatTTSText').value;
+  var context = document.getElementById('chatTTSContext').value.trim();
+
+  var messages = [];
+  if (context) messages.push({ role: 'user', content: context });
+  messages.push({ role: 'assistant', content: text });
+  var body = { model: model, messages: messages, audio: { format: format, voice: voice } };
+
+  var cmd = 'curl ' + b + '/v1/chat/completions \\' + auth +
+    '\n  -H "Content-Type: application/json" \\' +
+    "\n  -d '" + JSON.stringify(body) + "'";
+  navigator.clipboard.writeText(cmd);
+  showResult('chatTTSResult', 'cURL copied to clipboard:\n\n' + cmd, false);
 }
 
 // Recording

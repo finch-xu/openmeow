@@ -6,14 +6,15 @@ struct ModelStoreView: View {
 
     enum ModelTab: String, CaseIterable, Hashable {
         case tts = "TTS"
+        case cloudTTS = "Cloud TTS"
         case asr = "ASR"
-        // case cloudTTS = "Cloud TTS"
         // case cloudASR = "Cloud ASR"
     }
 
     private var currentModels: [ModelRegistryEntry] {
         switch selectedTab {
-        case .tts: appState.ttsModels
+        case .tts: appState.localTTSModels
+        case .cloudTTS: appState.cloudTTSModels
         case .asr: appState.asrModels
         }
     }
@@ -25,7 +26,13 @@ struct ModelStoreView: View {
                 ForEach(ModelTab.allCases, id: \.self) { tab in
                     TabButton(
                         title: tab.rawValue,
-                        count: tab == .tts ? appState.ttsModels.count : appState.asrModels.count,
+                        count: {
+                            switch tab {
+                            case .tts: appState.localTTSModels.count
+                            case .cloudTTS: appState.cloudTTSModels.count
+                            case .asr: appState.asrModels.count
+                            }
+                        }(),
                         isSelected: selectedTab == tab
                     ) {
                         selectedTab = tab
@@ -44,15 +51,25 @@ struct ModelStoreView: View {
             ScrollView {
                 LazyVStack(spacing: 10) {
                     ForEach(currentModels) { model in
-                        ModelCard(
-                            model: model,
-                            state: appState.downloadState(for: model.id),
-                            onDownload: { appState.downloadModel(model.id) },
-                            onStart: { Task { await appState.loadModel(model.id) } },
-                            onStop: { Task { await appState.unloadModel(model.id) } },
-                            onDelete: { appState.deleteModel(model.id) },
-                            onCancel: { appState.cancelDownload(model.id) }
-                        )
+                        if model.engine.isCloud {
+                            CloudModelCard(
+                                model: model,
+                                state: appState.downloadState(for: model.id),
+                                onEnable: { appState.downloadModel(model.id) },
+                                onStart: { Task { await appState.loadModel(model.id) } },
+                                onStop: { Task { await appState.unloadModel(model.id) } }
+                            )
+                        } else {
+                            ModelCard(
+                                model: model,
+                                state: appState.downloadState(for: model.id),
+                                onDownload: { appState.downloadModel(model.id) },
+                                onStart: { Task { await appState.loadModel(model.id) } },
+                                onStop: { Task { await appState.unloadModel(model.id) } },
+                                onDelete: { appState.deleteModel(model.id) },
+                                onCancel: { appState.cancelDownload(model.id) }
+                            )
+                        }
                     }
 
                     if currentModels.isEmpty {
@@ -277,5 +294,173 @@ private struct TagView: View {
             .padding(.horizontal, 5).padding(.vertical, 2)
             .background(color.opacity(0.08)).foregroundStyle(color)
             .clipShape(RoundedRectangle(cornerRadius: 4))
+    }
+}
+
+// MARK: - Cloud Model Card
+
+private struct CloudModelCard: View {
+    let model: ModelRegistryEntry
+    let state: ModelDownloadState
+    let onEnable: () -> Void
+    let onStart: () -> Void
+    let onStop: () -> Void
+
+    @State private var apiKeyInput = ""
+    @State private var isEditingKey = false
+
+    private var apiKeySettingsKey: String {
+        model.config.apiKeySettingsKey ?? ""
+    }
+
+    private var savedApiKey: String {
+        UserDefaults.standard.string(forKey: apiKeySettingsKey) ?? ""
+    }
+
+    private var maskedKey: String {
+        let key = savedApiKey
+        guard key.count > 8 else { return String(repeating: "*", count: key.count) }
+        return String(key.prefix(4)) + "****" + String(key.suffix(4))
+    }
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 14) {
+            VStack(alignment: .leading, spacing: 5) {
+                HStack(spacing: 6) {
+                    Text(model.displayName.localized)
+                        .font(.subheadline.weight(.semibold))
+                    StatusBadge(status: model.status)
+                    TagView(text: "Cloud", color: .indigo)
+                }
+
+                Text(model.description.localized)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+
+                HStack(spacing: 10) {
+                    TagView(text: model.languages.joined(separator: ", "), color: .blue)
+                    if model.voiceCount > 0 {
+                        Text("\(model.voiceCount) voices")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+
+                // API Key section
+                if isEditingKey || savedApiKey.isEmpty {
+                    HStack(spacing: 6) {
+                        SecureField("API Key", text: $apiKeyInput)
+                            .textFieldStyle(.roundedBorder)
+                            .font(.caption)
+                            .frame(maxWidth: 200)
+                        Button("Save") {
+                            UserDefaults.standard.set(apiKeyInput, forKey: apiKeySettingsKey)
+                            isEditingKey = false
+                            apiKeyInput = ""
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.mini)
+                        .disabled(apiKeyInput.isEmpty)
+                        if !savedApiKey.isEmpty {
+                            Button("Cancel") {
+                                isEditingKey = false
+                                apiKeyInput = ""
+                            }
+                            .buttonStyle(.plain)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        }
+                    }
+                } else {
+                    HStack(spacing: 6) {
+                        Image(systemName: "key.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.green)
+                        Text(maskedKey)
+                            .font(.caption2.monospaced())
+                            .foregroundStyle(.secondary)
+                        Button {
+                            isEditingKey = true
+                            apiKeyInput = savedApiKey
+                        } label: {
+                            Image(systemName: "pencil")
+                                .font(.caption2)
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.secondary)
+                    }
+                }
+            }
+
+            Spacer()
+
+            actionView.frame(width: 90)
+        }
+        .padding(12)
+        .background(.background)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(.quaternary, lineWidth: 1))
+    }
+
+    @ViewBuilder
+    private var actionView: some View {
+        switch state {
+        case .notInstalled:
+            VStack(spacing: 4) {
+                Button("Enable", action: onEnable)
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+                    .disabled(savedApiKey.isEmpty)
+                if savedApiKey.isEmpty {
+                    Text("Set API Key")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+        case .stopped:
+            VStack(spacing: 4) {
+                Button(action: onStart) {
+                    Image(systemName: "play.fill")
+                        .font(.caption)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.green)
+                .controlSize(.small)
+                Text("Stopped")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+
+        case .running:
+            VStack(spacing: 4) {
+                Button(action: onStop) {
+                    Image(systemName: "stop.fill")
+                        .font(.caption)
+                }
+                .buttonStyle(.bordered)
+                .tint(.orange)
+                .controlSize(.small)
+                HStack(spacing: 3) {
+                    Circle().fill(.green).frame(width: 5, height: 5)
+                    Text("Running")
+                        .font(.caption2)
+                        .foregroundStyle(.green)
+                }
+            }
+
+        case .error(let msg):
+            VStack(spacing: 4) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.red).font(.caption)
+                Text(msg).font(.caption2).lineLimit(2).foregroundStyle(.red)
+                Button("Retry", action: onEnable)
+                    .buttonStyle(.bordered).controlSize(.mini)
+            }
+
+        default:
+            ProgressView().controlSize(.small)
+        }
     }
 }

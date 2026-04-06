@@ -300,6 +300,9 @@
         }
       }
     },
+    "API Key" : {
+
+    },
     "app.name" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -396,6 +399,9 @@
           }
         }
       }
+    },
+    "Cloud" : {
+
     },
     "Copy API URL" : {
       "extractionState" : "stale",
@@ -556,6 +562,9 @@
           }
         }
       }
+    },
+    "Enable" : {
+
     },
     "Enable Bearer Token Authentication" : {
       "localizations" : {
@@ -1049,6 +1058,9 @@
         }
       }
     },
+    "Save" : {
+
+    },
     "Server" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1092,6 +1104,9 @@
           }
         }
       }
+    },
+    "Set API Key" : {
+
     },
     "Settings" : {
       "localizations" : {

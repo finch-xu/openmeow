@@ -44,16 +44,18 @@ struct ResourcesView: View {
                                     Text(entry?.displayName.localized ?? modelID)
                                         .font(.caption)
                                     if let entry {
-                                        Text(entry.engine == .whisperKit ? "CoreML" : entry.engine == .speechSwift ? "MLX" : "ONNX")
+                                        Text(entry.engine.isCloud ? "Cloud" : entry.engine == .whisperKit ? "CoreML" : entry.engine == .speechSwift ? "MLX" : "ONNX")
                                             .font(.system(size: 8, weight: .medium))
                                             .padding(.horizontal, 4)
                                             .padding(.vertical, 1)
                                             .background(
+                                                entry.engine.isCloud ? Color.indigo.opacity(0.12) :
                                                 entry.engine == .whisperKit ? Color.teal.opacity(0.12) :
                                                 entry.engine == .speechSwift ? Color.purple.opacity(0.12) :
                                                 Color.gray.opacity(0.12)
                                             )
                                             .foregroundStyle(
+                                                entry.engine.isCloud ? .indigo :
                                                 entry.engine == .whisperKit ? .teal :
                                                 entry.engine == .speechSwift ? .purple :
                                                 .secondary
