@@ -113,9 +113,13 @@ final class AppState {
 
         // Auto-load all installed models (skip user-disabled ones and unimplemented engines)
         let disabledIDs = Set(UserDefaults.standard.stringArray(forKey: AppConstants.disabledModelsKey) ?? [])
-        for entry in allEntries where entry.engine == .sherpaOnnx || entry.engine == .whisperKit || entry.engine == .speechSwift {
+        for entry in allEntries where entry.engine == .sherpaOnnx || entry.engine == .whisperKit || entry.engine == .speechSwift || entry.engine.isCloud {
             guard !disabledIDs.contains(entry.id) else { continue }
-            guard await modelManager.effectiveModelPath(entry.id) != nil else { continue }
+            if entry.engine.isCloud {
+                guard isCloudModelConfigured(entry) else { continue }
+            } else {
+                guard await modelManager.effectiveModelPath(entry.id) != nil else { continue }
+            }
             await loadModelEngine(entry)
         }
 
@@ -211,6 +215,43 @@ final class AppState {
             return
         }
 
+        // Cloud engines: no local files, just create the provider
+        if entry.engine.isCloud {
+            guard !(await providerRouter.isModelLoaded(modelID)) else { return }
+            do {
+                let endpoint = entry.config.cloudEndpoint ?? ""
+                let cloudModel = entry.config.cloudModel ?? modelID
+                let keySettingsKey = entry.config.apiKeySettingsKey ?? ""
+                let authHeader = entry.config.authHeader ?? "Authorization"
+                let authPrefix = entry.config.authPrefix ?? "Bearer "
+                let voices = entry.voiceList ?? []
+
+                if entry.engine == .openaiCloud {
+                    let provider = OpenAICloudTTS(
+                        modelID: modelID, endpoint: endpoint, cloudModel: cloudModel,
+                        apiKeySettingsKey: keySettingsKey, authHeader: authHeader,
+                        authPrefix: authPrefix, voices: voices
+                    )
+                    await providerRouter.registerTTS(provider, for: modelID)
+                } else if entry.engine == .mimoCloud {
+                    let provider = MiMoCloudTTS(
+                        modelID: modelID, endpoint: endpoint, cloudModel: cloudModel,
+                        apiKeySettingsKey: keySettingsKey, authHeader: authHeader,
+                        authPrefix: authPrefix, voices: voices
+                    )
+                    await providerRouter.registerTTS(provider, for: modelID)
+                }
+
+                await modelManager.setModelRunning(modelID)
+                logger.info("Loaded cloud model: \(modelID)")
+            } catch {
+                logger.warning("Failed to load cloud \(modelID): \(error)")
+                await modelManager.setModelError(modelID, error.localizedDescription)
+                await refreshDownloadStates()
+            }
+            return
+        }
+
         guard let modelPath = await modelManager.effectiveModelPath(modelID) else { return }
         guard !(await providerRouter.isModelLoaded(modelID)) else { return }
 
@@ -258,6 +299,9 @@ final class AppState {
 
             case .speechSwift:
                 break // handled above
+
+            case .openaiCloud, .mimoCloud:
+                break // handled above (cloud early return)
             }
 
             await modelManager.setModelRunning(modelID)
@@ -322,6 +366,18 @@ final class AppState {
 
     func downloadModel(_ modelID: String) {
         guard let entry = availableModels.first(where: { $0.id == modelID }) else { return }
+
+        // Cloud models don't download; just load them
+        if entry.engine.isCloud {
+            Task {
+                await loadModelEngine(entry)
+                await registerApiNames()
+                await updateAliases()
+                loadedModels = await providerRouter.allModels().map(\.id)
+                await refreshDownloadStates()
+            }
+            return
+        }
 
         // WhisperKit models use their SDK's download API
         if entry.engine == .whisperKit {
@@ -507,6 +563,16 @@ final class AppState {
 
     private func refreshDownloadStates() async {
         downloadStates = await modelManager.allStates(for: availableModels)
+        // Override states for cloud models (they have no local files)
+        for entry in availableModels where entry.engine.isCloud {
+            if await providerRouter.isModelLoaded(entry.id) {
+                downloadStates[entry.id] = .running
+            } else if isCloudModelConfigured(entry) {
+                downloadStates[entry.id] = .stopped
+            } else {
+                downloadStates[entry.id] = .notInstalled
+            }
+        }
     }
 
     // MARK: - Computed Helpers
@@ -515,7 +581,21 @@ final class AppState {
         availableModels.filter { $0.type == .tts }
     }
 
+    var localTTSModels: [ModelRegistryEntry] {
+        availableModels.filter { $0.type == .tts && !$0.engine.isCloud }
+    }
+
+    var cloudTTSModels: [ModelRegistryEntry] {
+        availableModels.filter { $0.type == .tts && $0.engine.isCloud }
+    }
+
     var asrModels: [ModelRegistryEntry] {
         availableModels.filter { $0.type == .asr }
+    }
+
+    private func isCloudModelConfigured(_ entry: ModelRegistryEntry) -> Bool {
+        guard let key = entry.config.apiKeySettingsKey else { return false }
+        let apiKey = UserDefaults.standard.string(forKey: key) ?? ""
+        return !apiKey.isEmpty
     }
 }
