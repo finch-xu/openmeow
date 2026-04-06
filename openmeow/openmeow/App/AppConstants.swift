@@ -12,6 +12,8 @@ nonisolated enum AppConstants {
     static let corsEnabledKey = "apiCorsEnabled"
     static let corsOriginsKey = "apiCorsAllowedOrigins"
     static let defaultTTSFormatKey = "defaultTTSResponseFormat"
+    static let mimoApiKeyKey = "mimoApiKey"
+    static let openaiCloudApiKeyKey = "openaiCloudApiKey"
 
     /// Default CORS allowed IPs (plain IP, hostname, or CIDR notation)
     static let corsLocalOrigins = ["127.0.0.1", "localhost", "[::1]"]

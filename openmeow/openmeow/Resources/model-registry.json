@@ -1,6 +1,6 @@
 {
-  "version": 3,
-  "updated_at": "2026-03-27",
+  "version": 4,
+  "updated_at": "2026-04-06",
   "models": [
     {
       "id": "kokoro-multi-lang-v1_0",
@@ -203,6 +203,57 @@
       "config": { "hf_model_id": "aufklarer/Qwen3-TTS-12Hz-1.7B-Base-MLX-4bit", "quantization_bits": 4 },
       "status": "experimental",
       "tested_on": "OpenMeow 0.1.0"
+    },
+    {
+      "id": "openai-cloud-tts",
+      "api_id": "openai-cloud-tts",
+      "type": "tts",
+      "engine": "openai-cloud",
+      "runtime": "cloud",
+      "family": "openai-tts",
+      "version": "1.0",
+      "license": "Proprietary",
+      "display_name": { "en": "OpenAI TTS (Cloud)", "zh": "OpenAI TTS（云端）" },
+      "description": { "en": "OpenAI-compatible cloud TTS, configurable endpoint", "zh": "OpenAI 兼容云�� TTS，可自定义端点" },
+      "notes": { "en": "Requires API key, supports OpenAI-compatible services", "zh": "需要 API Key，支持 OpenAI 兼容服务" },
+      "languages": ["en", "zh", "ja", "ko", "fr", "de", "es", "pt", "ru", "it", "pl", "tr", "hi", "ar"],
+      "voice_list": [
+        { "id": "alloy", "name": "Alloy", "language": "en", "gender": "female" },
+        { "id": "echo", "name": "Echo", "language": "en", "gender": "male" },
+        { "id": "fable", "name": "Fable", "language": "en", "gender": "male" },
+        { "id": "onyx", "name": "Onyx", "language": "en", "gender": "male" },
+        { "id": "nova", "name": "Nova", "language": "en", "gender": "female" },
+        { "id": "shimmer", "name": "Shimmer", "language": "en", "gender": "female" }
+      ],
+      "sample_rate": 24000,
+      "size": { "download_mb": 0, "disk_mb": 0 },
+      "download": { "source": "cloud-managed", "url": "", "extract_format": "none" },
+      "config": { "cloud_endpoint": "https://api.openai.com", "cloud_model": "tts-1", "api_key_settings_key": "openaiCloudApiKey", "auth_header": "Authorization", "auth_prefix": "Bearer " },
+      "status": "beta"
+    },
+    {
+      "id": "mimo-v2-tts",
+      "api_id": "mimo-v2-tts",
+      "type": "tts",
+      "engine": "mimo-cloud",
+      "runtime": "cloud",
+      "family": "mimo-tts",
+      "version": "2.0",
+      "license": "Proprietary",
+      "display_name": { "en": "MiMo TTS v2 (Cloud)", "zh": "MiMo TTS v2（云端）" },
+      "description": { "en": "Xiaomi cloud TTS with style control, currently free", "zh": "小米云端 TTS，支持风格控制，限时免费" },
+      "notes": { "en": "Requires Xiaomi MiMo API key", "zh": "需要小米 MiMo 平台 API Key" },
+      "languages": ["zh", "en"],
+      "voice_list": [
+        { "id": "mimo_default", "name": "Default", "language": "zh" },
+        { "id": "default_zh", "name": "Chinese Female", "language": "zh", "gender": "female" },
+        { "id": "default_en", "name": "English Female", "language": "en", "gender": "female" }
+      ],
+      "sample_rate": 24000,
+      "size": { "download_mb": 0, "disk_mb": 0 },
+      "download": { "source": "cloud-managed", "url": "", "extract_format": "none" },
+      "config": { "cloud_endpoint": "https://api.xiaomimimo.com", "cloud_model": "mimo-v2-tts", "api_key_settings_key": "mimoApiKey", "auth_header": "api-key", "auth_prefix": "" },
+      "status": "beta"
     },
     {
       "id": "fire-red-asr-zh-en",

@@ -55,6 +55,15 @@ nonisolated enum EngineType: String, Codable, Sendable {
     case sherpaOnnx = "sherpa-onnx"
     case speechSwift = "speech-swift"
     case whisperKit = "whisper-kit"
+    case openaiCloud = "openai-cloud"
+    case mimoCloud = "mimo-cloud"
+
+    var isCloud: Bool {
+        switch self {
+        case .openaiCloud, .mimoCloud: true
+        default: false
+        }
+    }
 }
 
 nonisolated enum ModelStatus: String, Codable, Sendable {
@@ -67,6 +76,7 @@ nonisolated enum DownloadSource: String, Codable, Sendable {
     case modelscope
     case customUrl = "custom-url"
     case whisperKitManaged = "whisperkit-managed"
+    case cloudManaged = "cloud-managed"
 }
 
 nonisolated enum ExtractFormat: String, Codable, Sendable {
@@ -181,6 +191,13 @@ nonisolated struct ModelConfig: Codable, Sendable {
     // WhisperKit / TTSKit
     let whisperKitVariant: String?
     let ttsKitVariant: String?
+
+    // Cloud TTS
+    let cloudEndpoint: String?
+    let cloudModel: String?
+    let apiKeySettingsKey: String?
+    let authHeader: String?
+    let authPrefix: String?
 
     // Common
     let numThreads: Int?

@@ -110,6 +110,8 @@ actor ModelManager {
                     throw ModelManagerError.unsupportedSource("modelscope")
                 case .whisperKitManaged:
                     throw ModelManagerError.unsupportedSource("whisperkit-managed: use AppState.downloadWhisperKitModel instead")
+                case .cloudManaged:
+                    throw ModelManagerError.unsupportedSource("cloud-managed: cloud models are handled by AppState directly")
                 }
 
                 await self.updateState(modelID, .stopped)
