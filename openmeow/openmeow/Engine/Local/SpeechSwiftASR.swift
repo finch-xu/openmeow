@@ -56,13 +56,19 @@ nonisolated final class SpeechSwiftASR: @unchecked Sendable {
     #endif
 
     /// Load model via speech-swift's fromPretrained (handles download + init).
+    /// Pass `cacheDir` to control where weights are stored; pass `offlineMode: true`
+    /// when re-loading already-downloaded files to skip network checks.
     static func loadModel(
         hfModelID: String,
+        cacheDir: URL? = nil,
+        offlineMode: Bool = false,
         progressHandler: @escaping @Sendable (Double, String) -> Void
     ) async throws -> Any {
         #if SPEECH_SWIFT_AVAILABLE
         return try await Qwen3ASRModel.fromPretrained(
             modelId: hfModelID,
+            cacheDir: cacheDir,
+            offlineMode: offlineMode,
             progressHandler: progressHandler
         )
         #else

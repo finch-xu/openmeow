@@ -105,6 +105,26 @@ final class AppState {
         logger.info("Force memory cleanup completed")
     }
 
+    /// Stop all engines and delete every downloaded model file. Caller is
+    /// responsible for confirming the destructive action.
+    func deleteAllModels() async {
+        await forceCleanupMemory()
+
+        // Off-main I/O: deleting multi-GB model dirs blocks long enough to be felt.
+        let dir = AppConstants.modelsDirectory
+        do {
+            try await Task.detached {
+                try FileManager.default.removeItem(at: dir)
+                try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            }.value
+            logger.info("All downloaded models deleted")
+        } catch {
+            logger.error("Failed to clear models directory: \(error)")
+        }
+
+        await refreshDownloadStates()
+    }
+
     // MARK: - Model Loading
 
     private func loadInstalledModels() async {
@@ -282,7 +302,31 @@ final class AppState {
                 }
 
             case .speechSwift:
-                break // handled above
+                #if SPEECH_SWIFT_AVAILABLE
+                let modelDir = URL(fileURLWithPath: modelPath)
+                let hfModelID = entry.config.hfModelId ?? ""
+                if entry.type == .tts {
+                    let model = try await SpeechSwiftTTS.loadModel(
+                        hfModelID: hfModelID, cacheDir: modelDir, offlineMode: true,
+                        progressHandler: { _, _ in }
+                    )
+                    let provider = SpeechSwiftTTS(
+                        modelID: modelID, model: model as! Qwen3TTSModel,
+                        voices: entry.voiceList ?? []
+                    )
+                    await providerRouter.registerTTS(provider, for: modelID)
+                } else {
+                    let model = try await SpeechSwiftASR.loadModel(
+                        hfModelID: hfModelID, cacheDir: modelDir, offlineMode: true,
+                        progressHandler: { _, _ in }
+                    )
+                    let provider = SpeechSwiftASR(
+                        modelID: modelID, model: model as! Qwen3ASRModel,
+                        languages: entry.languages
+                    )
+                    await providerRouter.registerASR(provider, for: modelID)
+                }
+                #endif
 
             case .openaiCloud, .mimoCloud, .qwenCloud:
                 break // handled above (cloud early return)
@@ -400,6 +444,10 @@ final class AppState {
 
                 let hfModelID = entry.config.hfModelId ?? ""
 
+                // Route weights into our managed models directory so ModelManager.deleteModel works uniformly.
+                let modelDir = AppConstants.modelsDirectory.appendingPathComponent(modelID)
+                try FileManager.default.createDirectory(at: modelDir, withIntermediateDirectories: true)
+
                 // fromPretrained combines download + init; bridge progress to our state
                 let progressHandler: @Sendable (Double, String) -> Void = { [weak self] fraction, _ in
                     Task { @MainActor in
@@ -414,7 +462,7 @@ final class AppState {
                 #if SPEECH_SWIFT_AVAILABLE
                 if entry.type == .tts {
                     let model = try await SpeechSwiftTTS.loadModel(
-                        hfModelID: hfModelID, progressHandler: progressHandler
+                        hfModelID: hfModelID, cacheDir: modelDir, progressHandler: progressHandler
                     )
                     let provider = SpeechSwiftTTS(
                         modelID: modelID, model: model as! Qwen3TTSModel,
@@ -423,7 +471,7 @@ final class AppState {
                     await providerRouter.registerTTS(provider, for: modelID)
                 } else {
                     let model = try await SpeechSwiftASR.loadModel(
-                        hfModelID: hfModelID, progressHandler: progressHandler
+                        hfModelID: hfModelID, cacheDir: modelDir, progressHandler: progressHandler
                     )
                     let provider = SpeechSwiftASR(
                         modelID: modelID, model: model as! Qwen3ASRModel,
@@ -434,16 +482,6 @@ final class AppState {
                 #else
                 throw SpeechSwiftError.modelNotAvailable("SPEECH_SWIFT_AVAILABLE not set")
                 #endif
-
-                // Create sentinel directory so ModelManager recognizes as installed
-                let sentinelDir = AppConstants.modelsDirectory.appendingPathComponent(modelID)
-                try FileManager.default.createDirectory(at: sentinelDir, withIntermediateDirectories: true)
-                let meta: [String: Any] = [
-                    "engine": "speech-swift",
-                    "hfModelId": hfModelID
-                ]
-                let metaData = try JSONSerialization.data(withJSONObject: meta, options: .prettyPrinted)
-                try metaData.write(to: sentinelDir.appendingPathComponent(".speech-swift-meta.json"))
 
                 await modelManager.setModelRunning(modelID)
                 await registerApiNames()
@@ -461,20 +499,8 @@ final class AppState {
 
     func deleteModel(_ modelID: String) {
         Task {
-            // Unload first if running
             await unloadModel(modelID)
             do {
-                // Clean up speech-swift's own model cache if applicable
-                if let entry = availableModels.first(where: { $0.id == modelID }),
-                   entry.engine == .speechSwift,
-                   let hfModelID = entry.config.hfModelId {
-                    let cacheBase = FileManager.default.homeDirectoryForCurrentUser
-                        .appendingPathComponent("Library/Caches/qwen3-speech")
-                    let cacheDir = cacheBase.appendingPathComponent(
-                        hfModelID.replacingOccurrences(of: "/", with: "_")
-                    )
-                    try? FileManager.default.removeItem(at: cacheDir)
-                }
                 try await modelManager.deleteModel(modelID)
                 await refreshDownloadStates()
             } catch {

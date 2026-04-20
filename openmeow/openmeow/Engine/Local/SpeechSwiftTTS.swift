@@ -73,13 +73,19 @@ nonisolated final class SpeechSwiftTTS: @unchecked Sendable {
 
     /// Load model via speech-swift's fromPretrained (handles download + init).
     /// progressHandler receives (fraction 0..1, status message).
+    /// Pass `cacheDir` to control where weights are stored; pass `offlineMode: true`
+    /// when re-loading already-downloaded files to skip network checks.
     static func loadModel(
         hfModelID: String,
+        cacheDir: URL? = nil,
+        offlineMode: Bool = false,
         progressHandler: @escaping @Sendable (Double, String) -> Void
     ) async throws -> Any {
         #if SPEECH_SWIFT_AVAILABLE
         return try await Qwen3TTSModel.fromPretrained(
             modelId: hfModelID,
+            cacheDir: cacheDir,
+            offlineMode: offlineMode,
             progressHandler: progressHandler
         )
         #else

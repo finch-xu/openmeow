@@ -12,6 +12,8 @@ struct SettingsContentView: View {
     @State private var pendingPort: String = ""
     @State private var needsRestart = false
     @State private var languageNeedsRestart = false
+    @State private var showDeleteAllAlert = false
+    @State private var isDeletingAllModels = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -22,6 +24,7 @@ struct SettingsContentView: View {
                 VStack(spacing: 14) {
                     serverCard
                     appearanceCard
+                    storageCard
                     aboutCard
                 }
                 .frame(maxWidth: 720, alignment: .leading)
@@ -32,6 +35,18 @@ struct SettingsContentView: View {
         }
         .background(theme.bg)
         .onAppear { pendingPort = "\(port)" }
+        .alert("Delete all downloaded models?", isPresented: $showDeleteAllAlert) {
+            Button("Delete all", role: .destructive) {
+                isDeletingAllModels = true
+                Task {
+                    await appState.deleteAllModels()
+                    isDeletingAllModels = false
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will stop all running engines and permanently remove every model file in \(AppConstants.modelsDirectory.path). You will need to re-download any model you want to use again.")
+        }
     }
 
     private var serverCard: some View {
@@ -172,6 +187,24 @@ struct SettingsContentView: View {
             UserDefaults.standard.set([code], forKey: "AppleLanguages")
         }
         languageNeedsRestart = true
+    }
+
+    private var storageCard: some View {
+        OMCard(title: "Storage", subtitle: "Local model files") {
+            VStack(alignment: .leading, spacing: 14) {
+                Text("Stops every loaded engine and deletes all downloaded model files. Cloud-only models are unaffected.")
+                    .font(.omCaption)
+                    .foregroundStyle(theme.ink3)
+
+                OMButton(
+                    title: isDeletingAllModels ? "Deleting…" : "Delete all models",
+                    variant: .danger
+                ) {
+                    showDeleteAllAlert = true
+                }
+                .disabled(isDeletingAllModels)
+            }
+        }
     }
 
     private var aboutCard: some View {
