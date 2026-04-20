@@ -34,10 +34,11 @@
 
 ## 功能
 
+- **支持模型** - Kokoro TTS、Kitten TTS、Qwen3 TTS、MiMo v2 TTS、FireRedASR v2、Qwen3 ASR等本地或云端模型
 - **菜单栏应用** — 在 macOS 后台静默运行（Apple Silicon）
 - **OpenAI 兼容 API** — 可直接替换 `/v1/audio/speech` 和 `/v1/audio/transcriptions`
 - **多引擎支持** — sherpa-onnx、speech-swift（Qwen3-TTS/ASR）
-- **云端 TTS** — 支持 OpenAI 兼容服务、MiMo、Qwen3 TTS Flash（DashScope），40+ 音色
+- **云端 TTS** — 支持 OpenAI 兼容服务、小米MiMo、阿里Qwen3等云端模型API接入
 - **音频格式** — WAV、MP3、Opus（OGG/WebM）、PCM、FLAC、AAC
 - **模型商店** — 内置模型注册表，一键下载管理
 - **接入 OpenClaw** — 一行配置即可让 [OpenClaw](https://github.com/openclaw/openclaw) 获得本地语音能力
@@ -185,8 +186,6 @@ open openmeow/openmeow.xcodeproj
 |------|--------|------|
 | [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) | Apache-2.0 | 端侧语音引擎（TTS/ASR）|
 | [speech-swift](https://github.com/soniqo/speech-swift) | Apache-2.0 | Qwen3-TTS/ASR（MLX 加速）|
-| [Hummingbird](https://github.com/hummingbird-project/hummingbird) | Apache-2.0 | 轻量 HTTP 服务器 |
-| [Opus](https://github.com/xiph/opus) / [Ogg](https://github.com/xiph/ogg) | BSD-3-Clause | 音频编解码器 |
 | [LAME](https://lame.sourceforge.io/) | LGPL-2.0 | MP3 编码器（动态链接）|
 
 LAME 是唯一的 LGPL 组件，以动态链接方式（`libmp3lame.dylib`）使用。你可以用自己编译的版本替换。详见 [THIRD-PARTY-LICENSES](THIRD-PARTY-LICENSES)。

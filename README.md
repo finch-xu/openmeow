@@ -34,10 +34,11 @@
 
 ## Features
 
+- **Supported models** — Kokoro TTS, Kitten TTS, Qwen3 TTS, MiMo v2 TTS, FireRedASR v2, Qwen3 ASR, and more (local or cloud)
 - **Menu bar app** — runs quietly in the background on macOS (Apple Silicon)
 - **OpenAI-compatible API** — drop-in replacement for `/v1/audio/speech` and `/v1/audio/transcriptions`
 - **Multiple engines** — sherpa-onnx, speech-swift (Qwen3-TTS/ASR)
-- **Cloud TTS** — OpenAI-compatible, MiMo, and Qwen3 TTS Flash (DashScope) with 40+ voices
+- **Cloud TTS** — cloud-model API access including OpenAI-compatible services, Xiaomi MiMo, and Alibaba Qwen3
 - **Audio format support** — WAV, MP3, Opus (OGG/WebM), PCM, FLAC, AAC
 - **Model store** — download and manage models from the built-in registry
 - **Works with OpenClaw** — give [OpenClaw](https://github.com/openclaw/openclaw) local voice capabilities in one line of config
@@ -185,8 +186,6 @@ open openmeow/openmeow.xcodeproj
 |-----------|---------|------|
 | [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) | Apache-2.0 | On-device speech (TTS/ASR) |
 | [speech-swift](https://github.com/soniqo/speech-swift) | Apache-2.0 | Qwen3-TTS/ASR via MLX |
-| [Hummingbird](https://github.com/hummingbird-project/hummingbird) | Apache-2.0 | Lightweight HTTP server |
-| [Opus](https://github.com/xiph/opus) / [Ogg](https://github.com/xiph/ogg) | BSD-3-Clause | Audio codec |
 | [LAME](https://lame.sourceforge.io/) | LGPL-2.0 | MP3 encoder (dynamically linked) |
 
 LAME is the only LGPL component and is dynamically linked as `libmp3lame.dylib`. You may replace it with your own build. See [THIRD-PARTY-LICENSES](THIRD-PARTY-LICENSES) for details.
