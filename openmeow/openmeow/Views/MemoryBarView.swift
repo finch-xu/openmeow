@@ -1,87 +1,54 @@
 import SwiftUI
 
+/// Flex memory bar with segments proportional to bytes.
+/// Design-aligned: single 28px rounded bar (app=accent / other=ink4 / free=surface2) + inline legend.
 struct MemoryBarView: View {
+    @Environment(\.omTheme) private var theme
     let info: MemoryInfo
-    var onForceCleanup: (() -> Void)?
 
-    private let barHeight: CGFloat = 22
-    private let barRadius: CGFloat = 6
-    private let segmentSpacing: CGFloat = 1.5
-    private let minSegmentWidth: CGFloat = 4
-
-    private var segments: [(color: Color, bytes: UInt64, label: String)] {
-        var result: [(Color, UInt64, String)] = []
-        if info.appBytes > 0 {
-            result.append((.blue, info.appBytes, "OpenMeow"))
-        }
-        if info.freeBytes > 0 {
-            result.append((Color(red: 0.18, green: 0.8, blue: 0.44), info.freeBytes, "Free"))
-        }
-        if info.otherBytes > 0 {
-            result.append((Color(red: 0.58, green: 0.65, blue: 0.65), info.otherBytes, "System"))
-        }
-        return result
-    }
+    private let barHeight: CGFloat = 28
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            // Header
-            HStack {
-                Text("Memory")
-                    .font(.subheadline.weight(.medium))
-                Spacer()
-                if let onForceCleanup {
-                    Button {
-                        onForceCleanup()
-                    } label: {
-                        Label("Force Cleanup", systemImage: "arrow.3.trianglepath")
-                            .font(.caption)
-                    }
-                    .controlSize(.small)
-                    .buttonStyle(.bordered)
-                    .help("Unload all models and release memory")
-                }
-                Text("Total \(MemoryInfo.format(info.totalBytes))")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            // Bar
-            GeometryReader { geo in
-                let totalWidth = geo.size.width
-                let spacingTotal = segmentSpacing * CGFloat(max(0, segments.count - 1))
-                let availableWidth = totalWidth - spacingTotal
-
-                HStack(spacing: segmentSpacing) {
-                    ForEach(Array(segments.enumerated()), id: \.offset) { _, segment in
-                        let ratio = Double(segment.bytes) / Double(max(info.totalBytes, 1))
-                        let width = max(minSegmentWidth, availableWidth * CGFloat(ratio))
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(segment.color)
-                            .frame(width: width)
-                    }
-                }
-                .frame(height: barHeight)
-                .clipShape(RoundedRectangle(cornerRadius: barRadius))
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 2) {
+                segment(for: info.appBytes, color: theme.accent)
+                segment(for: info.otherBytes, color: theme.ink4)
+                segment(for: info.freeBytes, color: theme.surface2)
             }
             .frame(height: barHeight)
+            .clipShape(RoundedRectangle(cornerRadius: OMRadius.sm))
 
-            // Legend
-            HStack(spacing: 16) {
-                ForEach(Array(segments.enumerated()), id: \.offset) { _, segment in
-                    HStack(spacing: 4) {
-                        Circle()
-                            .fill(segment.color)
-                            .frame(width: 8, height: 8)
-                        Text(segment.label)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text(MemoryInfo.format(segment.bytes))
-                            .font(.caption.monospaced())
-                            .foregroundStyle(.primary)
-                    }
-                }
+            HStack(spacing: 20) {
+                legend(color: theme.accent, label: "OpenMeow",      value: MemoryInfo.format(info.appBytes))
+                legend(color: theme.ink4,   label: "System & other", value: MemoryInfo.format(info.otherBytes))
+                legend(color: theme.surface2, label: "Free",         value: MemoryInfo.format(info.freeBytes), ring: true)
+                Spacer(minLength: 0)
             }
+        }
+    }
+
+    private func segment(for bytes: UInt64, color: Color) -> some View {
+        let ratio = Double(bytes) / Double(max(info.totalBytes, 1))
+        return Rectangle()
+            .fill(color)
+            .frame(maxWidth: .infinity)
+            .layoutPriority(ratio > 0 ? ratio : 0.001)
+            .opacity(bytes == 0 ? 0 : 1)
+    }
+
+    private func legend(color: Color, label: String, value: String, ring: Bool = false) -> some View {
+        HStack(spacing: 7) {
+            RoundedRectangle(cornerRadius: 2)
+                .fill(color)
+                .frame(width: 10, height: 10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 2)
+                        .strokeBorder(ring ? theme.divider : .clear, lineWidth: 1)
+                )
+            Text(label).font(.omBody).foregroundStyle(theme.ink3)
+            Text(value)
+                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                .foregroundStyle(theme.ink)
         }
     }
 }

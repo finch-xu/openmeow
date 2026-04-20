@@ -1,121 +1,129 @@
 import SwiftUI
 
+private let cachedCPUName: String = {
+    var size = 0
+    sysctlbyname("machdep.cpu.brand_string", nil, &size, nil, 0)
+    var result = [CChar](repeating: 0, count: size)
+    sysctlbyname("machdep.cpu.brand_string", &result, &size, nil, 0)
+    return String(cString: result)
+}()
+
+private let cachedOSVersion = ProcessInfo.processInfo.operatingSystemVersionString
+private let cachedRAM = MemoryInfo.format(ProcessInfo.processInfo.physicalMemory)
+private let cachedCores = "\(ProcessInfo.processInfo.processorCount)"
+private let cachedAppVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0"
+private let cachedAppBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
+
 struct ResourcesView: View {
+    @Environment(\.omTheme) private var theme
     @Environment(AppState.self) private var appState
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                // Memory bar
-                GroupBox {
-                    if let info = appState.memoryInfo {
-                        MemoryBarView(info: info) {
-                            Task { await appState.forceCleanupMemory() }
-                        }
-                    } else {
-                        HStack {
-                            Spacer()
-                            ProgressView("Loading memory info...")
-                            Spacer()
-                        }
-                        .padding(.vertical, 8)
-                    }
-                } label: {
-                    Label("Memory Usage", systemImage: "memorychip")
-                        .font(.subheadline.weight(.medium))
-                }
+        VStack(spacing: 0) {
+            OMPageHeader(title: "Resources",
+                         subtitle: "Memory, system, and loaded models")
 
-                // Loaded models
-                GroupBox {
-                    if appState.loadedModels.isEmpty {
-                        Text("No models loaded")
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                            .padding(.vertical, 4)
-                    } else {
-                        VStack(alignment: .leading, spacing: 6) {
-                            ForEach(appState.loadedModels, id: \.self) { modelID in
-                                HStack(spacing: 8) {
-                                    let entry = appState.availableModels.first { $0.id == modelID }
-                                    Image(systemName: entry?.type == .tts ? "waveform" : "mic")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                        .frame(width: 16)
-                                    Text(entry?.displayName.localized ?? modelID)
-                                        .font(.caption)
-                                    if let entry {
-                                        Text(entry.engine.isCloud ? "Cloud" : entry.engine == .whisperKit ? "CoreML" : entry.engine == .speechSwift ? "MLX" : "ONNX")
-                                            .font(.system(size: 8, weight: .medium))
-                                            .padding(.horizontal, 4)
-                                            .padding(.vertical, 1)
-                                            .background(
-                                                entry.engine.isCloud ? Color.indigo.opacity(0.12) :
-                                                entry.engine == .whisperKit ? Color.teal.opacity(0.12) :
-                                                entry.engine == .speechSwift ? Color.purple.opacity(0.12) :
-                                                Color.gray.opacity(0.12)
-                                            )
-                                            .foregroundStyle(
-                                                entry.engine.isCloud ? .indigo :
-                                                entry.engine == .whisperKit ? .teal :
-                                                entry.engine == .speechSwift ? .purple :
-                                                .secondary
-                                            )
-                                            .clipShape(RoundedRectangle(cornerRadius: 3))
-                                    }
-                                    Spacer()
-                                    if let entry {
-                                        Text("\(entry.size.diskMb) MB")
-                                            .font(.caption2.monospaced())
-                                            .foregroundStyle(.tertiary)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } label: {
-                    Label("Loaded Models", systemImage: "square.stack.3d.up")
-                        .font(.subheadline.weight(.medium))
+            ScrollView {
+                VStack(spacing: 14) {
+                    memoryCard
+                    loadedCard
+                    systemCard
                 }
-
-                // System info
-                GroupBox {
-                    VStack(alignment: .leading, spacing: 10) {
-                        InfoLine(label: "macOS", value: ProcessInfo.processInfo.operatingSystemVersionString)
-                        InfoLine(label: "CPU", value: cpuName())
-                        InfoLine(label: "RAM", value: MemoryInfo.format(ProcessInfo.processInfo.physicalMemory))
-                        InfoLine(label: "Cores", value: "\(ProcessInfo.processInfo.processorCount)")
-                    }
-                } label: {
-                    Label("System", systemImage: "desktopcomputer")
-                        .font(.subheadline.weight(.medium))
-                }
+                .frame(maxWidth: 820, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(24)
             }
-            .padding(20)
+            .background(theme.bg)
+        }
+        .background(theme.bg)
+    }
+
+    private var memoryCard: some View {
+        OMCard(
+            title: "Memory usage",
+            subtitle: memorySubtitle
+        ) {
+            OMButton(title: "Force cleanup", icon: OMSymbol.refresh, size: .sm) {
+                Task { await appState.forceCleanupMemory() }
+            }
+        } content: {
+            if let info = appState.memoryInfo {
+                MemoryBarView(info: info)
+            } else {
+                HStack {
+                    Spacer()
+                    ProgressView().controlSize(.small)
+                    Text("Loading memory info…")
+                        .font(.omCaption)
+                        .foregroundStyle(theme.ink3)
+                    Spacer()
+                }
+                .padding(.vertical, 12)
+            }
         }
     }
 
-    private func cpuName() -> String {
-        var size = 0
-        sysctlbyname("machdep.cpu.brand_string", nil, &size, nil, 0)
-        var result = [CChar](repeating: 0, count: size)
-        sysctlbyname("machdep.cpu.brand_string", &result, &size, nil, 0)
-        return String(cString: result)
+    private var memorySubtitle: String {
+        guard let info = appState.memoryInfo else { return "—" }
+        let used = info.appBytes + info.otherBytes
+        let pct = Double(used) / Double(max(info.totalBytes, 1)) * 100
+        return "\(MemoryInfo.format(used)) used of \(MemoryInfo.format(info.totalBytes)) · \(Int(pct))% pressure"
     }
-}
 
-private struct InfoLine: View {
-    let label: String
-    let value: String
-    var body: some View {
-        HStack {
-            Text(label)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .frame(width: 70, alignment: .trailing)
-            Text(value)
-                .font(.caption.monospaced())
-                .textSelection(.enabled)
+    private var loadedCard: some View {
+        OMCard(
+            title: "Loaded models",
+            subtitle: "\(appState.loadedModels.count) active"
+        ) {
+            if appState.loadedModels.isEmpty {
+                Text("No models loaded — start a model from the Models page.")
+                    .font(.omCaption)
+                    .foregroundStyle(theme.ink3)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                VStack(spacing: 6) {
+                    ForEach(appState.loadedModelEntries) { entry in
+                        loadedRow(entry)
+                    }
+                }
+            }
+        }
+    }
+
+    private func loadedRow(_ entry: ModelRegistryEntry) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: entry.type == .tts ? OMSymbol.waveform : OMSymbol.mic)
+                .font(.system(size: 14))
+                .foregroundStyle(theme.accent)
+                .frame(width: 16)
+            Text(entry.displayName.localized)
+                .font(.system(size: 12.5, weight: .medium))
+                .foregroundStyle(theme.ink)
+            let eng = OMEngine.from(entry.engine)
+            OMTag(eng.label, variant: .engine(eng))
             Spacer()
+            Text("\(entry.size.diskMb) MB")
+                .font(.omMono)
+                .foregroundStyle(theme.ink3)
+            OMIconButton(icon: OMSymbol.stop, size: 24, help: "Unload") {
+                Task { await appState.unloadModel(entry.id) }
+            }
+        }
+        .padding(.horizontal, 10).padding(.vertical, 9)
+        .background(
+            RoundedRectangle(cornerRadius: OMRadius.sm).fill(theme.surface2)
+        )
+    }
+
+    private var systemCard: some View {
+        OMCard(title: "System") {
+            VStack(spacing: 0) {
+                OMKV(key: "macOS", value: cachedOSVersion)
+                OMKV(key: "Processor", value: cachedCPUName)
+                OMKV(key: "Memory", value: cachedRAM)
+                OMKV(key: "Cores", value: cachedCores)
+                OMKV(key: "OpenMeow", value: "v\(cachedAppVersion) · build \(cachedAppBuild)")
+            }
         }
     }
 }

@@ -2,175 +2,224 @@ import SwiftUI
 import AVFoundation
 
 struct TTSPlaygroundView: View {
+    @Environment(\.omTheme) private var theme
     @Environment(AppState.self) private var appState
+    @AppStorage(AppConstants.defaultTTSFormatKey) private var format: String = "opus"
 
-    @State private var inputText = "Hello, welcome to OpenMeow!"
+    @State private var inputText = "Welcome to OpenMeow — a local voice gateway for the OpenAI API. Try switching voices or tweaking speed on the right."
     @State private var selectedModelID = ""
     @State private var selectedVoiceID = ""
     @State private var speed: Double = 1.0
     @State private var isGenerating = false
+    @State private var isPlaying = false
     @State private var elapsedTime: Double?
     @State private var errorMessage: String?
     @State private var audioPlayer: AVAudioPlayer?
+    @State private var completionTask: Task<Void, Never>?
 
-    private var availableModels: [ModelRegistryEntry] {
-        appState.ttsModels.filter { appState.downloadState(for: $0.id) == .running }
-    }
-
+    private var availableModels: [ModelRegistryEntry] { appState.runningTTSModels }
     private var selectedModel: ModelRegistryEntry? {
         availableModels.first { $0.id == selectedModelID }
     }
-
-    private var voices: [VoiceInfo] {
-        selectedModel?.voiceList ?? []
-    }
+    private var voices: [VoiceInfo] { selectedModel?.voiceList ?? [] }
 
     var body: some View {
-        HStack(spacing: 0) {
-            // Left: Controls
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    // Text input
-                    VStack(alignment: .leading, spacing: 6) {
-                        Label("Text", systemImage: "text.alignleft")
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(.secondary)
-                        TextEditor(text: $inputText)
-                            .font(.body)
-                            .frame(minHeight: 100)
-                            .padding(8)
-                            .background(.background)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(.quaternary, lineWidth: 1)
-                            )
-                    }
+        HStack(alignment: .top, spacing: 16) {
+            leftPanel
+            settingsPanel
+        }
+        .padding(20)
+        .onAppear { autoSelect() }
+        .onDisappear { completionTask?.cancel() }
+        .onChange(of: appState.loadedModels) { _, _ in autoSelect() }
+        .onChange(of: selectedModelID) { _, _ in
+            if let v = selectedModel?.voiceList?.first { selectedVoiceID = v.id }
+        }
+    }
 
-                    // Model & Voice
-                    GroupBox {
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack {
-                                Text("Model")
-                                    .frame(width: 70, alignment: .trailing)
-                                Picker("Model", selection: $selectedModelID) {
-                                    if availableModels.isEmpty {
-                                        Text("No models").tag("")
-                                    }
-                                    ForEach(availableModels) { m in
-                                        Text(m.displayName.localized).tag(m.id)
-                                    }
-                                }
-                                .labelsHidden()
-                                Spacer()
-                            }
+    private var leftPanel: some View {
+        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("INPUT TEXT")
+                    .font(.omMeta).tracking(0.5)
+                    .foregroundStyle(theme.ink4)
 
-                            if !voices.isEmpty {
-                                HStack {
-                                    Text("Voice")
-                                        .frame(width: 70, alignment: .trailing)
-                                    Picker("Voice", selection: $selectedVoiceID) {
-                                        ForEach(voices, id: \.id) { v in
-                                            Text("\(v.name) (\(v.gender ?? ""))")
-                                                .tag(v.id)
-                                        }
-                                    }
-                                    .labelsHidden()
-                                    Spacer()
-                                }
-                            }
+                TextEditor(text: $inputText)
+                    .font(.system(size: 14))
+                    .foregroundStyle(theme.ink)
+                    .scrollContentBackground(.hidden)
+                    .frame(minHeight: 140)
 
-                            HStack {
-                                Text("Speed")
-                                    .frame(width: 70, alignment: .trailing)
-                                Slider(value: $speed, in: 0.5...2.0, step: 0.1)
-                                Text("\(speed, specifier: "%.1f")x")
-                                    .font(.caption.monospaced())
-                                    .frame(width: 32)
-                            }
-                        }
-                    } label: {
-                        Label("Settings", systemImage: "slider.horizontal.3")
-                            .font(.subheadline.weight(.medium))
-                    }
+                HStack {
+                    Text("\(inputText.count) chars")
+                    Spacer()
+                    Text("~\(max(1, Int(Double(inputText.count) / 15.0)))s output")
                 }
-                .padding(20)
+                .font(.omMono)
+                .foregroundStyle(theme.ink4)
             }
-            .frame(minWidth: 260, maxWidth: 320)
+            .padding(.horizontal, 18)
+            .padding(.vertical, 16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(
+                Rectangle().fill(theme.divider2).frame(height: 1),
+                alignment: .bottom
+            )
 
-            Divider()
-
-            // Right: Playback
             VStack(spacing: 20) {
-                Spacer()
+                Spacer(minLength: 0)
 
-                // Play button
-                Button(action: generateAndPlay) {
+                Button(action: generate) {
                     ZStack {
                         Circle()
-                            .fill(isGenerating ? Color.secondary.opacity(0.2) : Color.accentColor)
-                            .frame(width: 72, height: 72)
-                        Image(systemName: isGenerating ? "hourglass" : "play.fill")
-                            .font(.system(size: 28))
-                            .foregroundStyle(.white)
+                            .fill(theme.accent)
+                            .frame(width: 84, height: 84)
+                            .shadow(color: theme.accent.opacity(0.35), radius: 10, y: 6)
+                        Image(systemName: isGenerating ? "hourglass" : (isPlaying ? OMSymbol.pause : OMSymbol.play))
+                            .font(.system(size: 32, weight: .semibold))
+                            .foregroundStyle(theme.accentInk)
                     }
                 }
                 .buttonStyle(.plain)
                 .disabled(isGenerating || inputText.isEmpty || selectedModelID.isEmpty)
 
-                Text(isGenerating ? "Generating..." : "Generate & Play")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                OMWaveform(active: isGenerating || isPlaying)
 
-                // Status row
                 HStack(spacing: 12) {
-                    if let elapsed = elapsedTime {
-                        Label(String(format: "%.2fs", elapsed), systemImage: "clock")
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                    }
-                    if audioPlayer != nil {
-                        Button { audioPlayer?.play() } label: {
-                            Label("Replay", systemImage: "arrow.counterclockwise")
-                                .font(.caption)
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
+                    Text(statusLine)
+                    if let e = elapsedTime {
+                        Text("·").foregroundStyle(theme.ink4)
+                        Text(String(format: "%.2fs total", e))
                     }
                 }
+                .font(.omMono)
+                .foregroundStyle(theme.ink3)
 
                 if let error = errorMessage {
                     Text(error)
-                        .font(.caption)
-                        .foregroundStyle(.red)
+                        .font(.omCaption)
+                        .foregroundStyle(theme.err)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal)
+                        .padding(.horizontal, 20)
                 }
 
-                Spacer()
+                if availableModels.isEmpty {
+                    Text("No TTS model is running. Download one from Models.")
+                        .font(.omCaption)
+                        .foregroundStyle(theme.warn)
+                }
+
+                Spacer(minLength: 0)
             }
-            .frame(maxWidth: .infinity)
-            .padding()
+            .frame(maxWidth: .infinity, minHeight: 260)
+            .padding(32)
         }
-        .onAppear { autoSelectModel() }
-        .onChange(of: appState.loadedModels) { autoSelectModel() }
-        .onChange(of: selectedModelID) {
-            if let model = selectedModel, let first = model.voiceList?.first {
-                selectedVoiceID = first.id
+        .background(
+            RoundedRectangle(cornerRadius: OMRadius.lg).fill(theme.surface)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: OMRadius.lg).strokeBorder(theme.divider, lineWidth: 1)
+        )
+    }
+
+    private var statusLine: String {
+        if isGenerating { return "generating…" }
+        if isPlaying    { return "playing…" }
+        if audioPlayer != nil { return "ready — replay available" }
+        return "ready"
+    }
+
+    private var settingsPanel: some View {
+        PlaygroundSettingsPanel(endpointPath: "/v1/audio/speech") {
+            OMFieldGroup("Model") {
+                OMMenuPicker(selectedModel?.displayName.localized ?? "No models") {
+                    ForEach(availableModels) { m in
+                        Button(m.displayName.localized) { selectedModelID = m.id }
+                    }
+                    if availableModels.isEmpty {
+                        Text("No running TTS models")
+                    }
+                }
+            }
+
+            if !voices.isEmpty {
+                OMFieldGroup("Voice") { voiceList }
+            }
+
+            OMFieldGroup("Speed · \(String(format: "%.1f", speed))×") {
+                VStack(spacing: 2) {
+                    Slider(value: $speed, in: 0.5...2.0, step: 0.1)
+                        .tint(theme.accent)
+                    HStack {
+                        Text("0.5×"); Spacer(); Text("1.0×"); Spacer(); Text("2.0×")
+                    }
+                    .font(.system(size: 10, design: .monospaced))
+                    .foregroundStyle(theme.ink4)
+                }
+            }
+
+            OMFieldGroup("Format") {
+                OMSegmented(options: ["opus","mp3","wav","flac","aac","pcm"], selection: $format)
             }
         }
     }
 
-    private func autoSelectModel() {
+    private var voiceList: some View {
+        ScrollView {
+            VStack(spacing: 3) {
+                ForEach(voices, id: \.id) { v in
+                    Button {
+                        selectedVoiceID = v.id
+                    } label: {
+                        HStack(spacing: 8) {
+                            Circle()
+                                .fill(v.gender?.uppercased() == "F" ? theme.errSoft : theme.accentSoft)
+                                .frame(width: 20, height: 20)
+                                .overlay(
+                                    Text(v.gender?.prefix(1).uppercased() ?? "·")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundStyle(v.gender?.uppercased() == "F" ? theme.err : theme.accent)
+                                )
+                            Text(v.name).font(.system(size: 12.5))
+                                .foregroundStyle(theme.ink)
+                            Spacer()
+                            Text(v.language.uppercased())
+                                .font(.system(size: 10, design: .monospaced))
+                                .foregroundStyle(theme.ink4)
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .background(
+                            RoundedRectangle(cornerRadius: OMRadius.xs)
+                                .fill(selectedVoiceID == v.id ? theme.surface : Color.clear)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: OMRadius.xs)
+                                .strokeBorder(selectedVoiceID == v.id ? theme.divider : .clear, lineWidth: 1)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(4)
+        }
+        .frame(maxHeight: 190)
+        .background(
+            RoundedRectangle(cornerRadius: OMRadius.sm).fill(theme.surface2)
+        )
+    }
+
+    private func autoSelect() {
         if selectedModelID.isEmpty, let first = availableModels.first {
             selectedModelID = first.id
         }
     }
 
-    private func generateAndPlay() {
+    private func generate() {
         isGenerating = true
         errorMessage = nil
         elapsedTime = nil
+        completionTask?.cancel()
 
         Task {
             let start = Date()
@@ -186,7 +235,7 @@ struct TTSPlaygroundView: View {
                     "input": inputText,
                     "voice": selectedVoiceID.isEmpty ? "0" : selectedVoiceID,
                     "speed": speed,
-                    "response_format": UserDefaults.standard.string(forKey: AppConstants.defaultTTSFormatKey) ?? "opus"
+                    "response_format": format
                 ]
                 request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
@@ -198,9 +247,17 @@ struct TTSPlaygroundView: View {
                 }
 
                 let player = try AVAudioPlayer(data: data)
-                self.audioPlayer = player
+                audioPlayer = player
                 player.play()
+                isPlaying = true
                 elapsedTime = Date().timeIntervalSince(start)
+
+                let duration = player.duration
+                completionTask = Task { [weak player] in
+                    try? await Task.sleep(for: .seconds(duration + 0.2))
+                    guard !Task.isCancelled, player != nil else { return }
+                    isPlaying = false
+                }
             } catch {
                 errorMessage = error.localizedDescription
             }

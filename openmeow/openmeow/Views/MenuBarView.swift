@@ -1,95 +1,106 @@
 import SwiftUI
 
 struct MenuBarView: View {
+    @Environment(\.omTheme) private var theme
     @Environment(AppState.self) private var appState
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            // Status header
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 6) {
-                    Circle()
-                        .fill(appState.serverRunning ? .green : .red.opacity(0.6))
-                        .frame(width: 8, height: 8)
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 8) {
+                OMDot(color: appState.serverRunning ? theme.ok : theme.err,
+                      pulse: appState.serverRunning)
+                VStack(alignment: .leading, spacing: 1) {
                     Text(appState.serverRunning ? "Running" : "Stopped")
-                        .font(.subheadline.weight(.medium))
-                    Spacer()
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(theme.ink)
+                    Text("127.0.0.1:\(appState.serverPort)")
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundStyle(theme.ink3)
                 }
+                Spacer()
                 if !appState.loadedModels.isEmpty {
-                    Text("\(appState.loadedModels.count) models loaded")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
+                    Text("\(appState.loadedModels.count) loaded")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(theme.ink3)
+                        .padding(.horizontal, 6).padding(.vertical, 2)
+                        .background(Capsule().fill(theme.surface2))
                 }
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 6)
+            .padding(.horizontal, 10).padding(.vertical, 10)
 
-            Divider().padding(.vertical, 2)
+            Divider().overlay(theme.divider2).padding(.horizontal, 8)
 
-            // Actions
-            if appState.serverRunning {
-                MenuBarButton(title: "Copy API URL", icon: "doc.on.doc") {
-                    NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(
-                        "http://localhost:\(appState.serverPort)/v1", forType: .string)
+            VStack(spacing: 2) {
+                if appState.serverRunning {
+                    MenuBarButton(title: "Copy API URL", icon: OMSymbol.copy) {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(
+                            "http://localhost:\(appState.serverPort)/v1", forType: .string)
+                    }
+                }
+
+                MenuBarButton(
+                    title: appState.serverRunning ? "Stop Server" : "Start Server",
+                    icon: appState.serverRunning ? OMSymbol.stop : OMSymbol.play
+                ) {
+                    Task {
+                        if appState.serverRunning { await appState.stopServer() }
+                        else { await appState.startServer() }
+                    }
                 }
             }
+            .padding(.horizontal, 6).padding(.top, 4)
 
-            MenuBarButton(
-                title: appState.serverRunning ? "Stop Server" : "Start Server",
-                icon: appState.serverRunning ? "stop.circle" : "play.circle"
-            ) {
-                Task {
-                    if appState.serverRunning { await appState.stopServer() }
-                    else { await appState.startServer() }
+            Divider().overlay(theme.divider2).padding(.horizontal, 8).padding(.vertical, 4)
+
+            VStack(spacing: 2) {
+                MenuBarButton(title: "Open Dashboard", icon: "macwindow") {
+                    openWindow(id: "dashboard")
+                    NSApplication.shared.activate()
+                }
+                MenuBarButton(title: "Quit OpenMeow", icon: "power", destructive: true) {
+                    Task {
+                        await appState.stopServer()
+                        NSApplication.shared.terminate(nil)
+                    }
                 }
             }
-
-            Divider().padding(.vertical, 2)
-
-            MenuBarButton(title: "Open Dashboard", icon: "macwindow") {
-                openWindow(id: "dashboard")
-                NSApplication.shared.activate()
-            }
-
-            Divider().padding(.vertical, 2)
-
-            MenuBarButton(title: "Quit OpenMeow", icon: "power") {
-                Task {
-                    await appState.stopServer()
-                    NSApplication.shared.terminate(nil)
-                }
-            }
+            .padding(.horizontal, 6).padding(.bottom, 6)
         }
-        .padding(6)
         .frame(width: 220)
+        .background(theme.surface)
     }
 }
 
 private struct MenuBarButton: View {
+    @Environment(\.omTheme) private var theme
     let title: String
     let icon: String
+    var destructive: Bool = false
     let action: () -> Void
 
-    @State private var isHovered = false
+    @State private var hover = false
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: 8) {
                 Image(systemName: icon)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(destructive ? theme.err : (hover ? theme.ink : theme.ink2))
                     .frame(width: 16)
-                    .foregroundStyle(.secondary)
                 Text(title)
+                    .font(.system(size: 12.5))
+                    .foregroundStyle(destructive ? theme.err : theme.ink)
                 Spacer()
             }
-            .font(.subheadline)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 6)
-            .background(isHovered ? Color.accentColor.opacity(0.1) : .clear)
-            .clipShape(RoundedRectangle(cornerRadius: 6))
+            .padding(.horizontal, 8).padding(.vertical, 6)
+            .background(
+                RoundedRectangle(cornerRadius: OMRadius.sm)
+                    .fill(hover ? theme.surface2 : .clear)
+            )
         }
         .buttonStyle(.plain)
-        .onHover { isHovered = $0 }
+        .onHover { hover = $0 }
     }
 }

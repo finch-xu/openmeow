@@ -5,6 +5,8 @@ nonisolated enum AppConstants {
     static let appSupportName = "OpenMeow"
     static let bundleID = "dev.pidan.openmeow"
     static let version = "0.1.0"
+    static let serverPortKey = "serverPort"
+    static let listenAddressKey = "listenAddress"
     static let disabledModelsKey = "disabledModelIDs"
     static let authEnabledKey = "apiAuthEnabled"
     static let authTokenKey = "apiAuthToken"

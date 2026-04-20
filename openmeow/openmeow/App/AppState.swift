@@ -600,6 +600,19 @@ final class AppState {
         availableModels.filter { $0.type == .asr }
     }
 
+    var loadedModelEntries: [ModelRegistryEntry] {
+        let ids = Set(loadedModels)
+        return availableModels.filter { ids.contains($0.id) }
+    }
+
+    var runningTTSModels: [ModelRegistryEntry] {
+        ttsModels.filter { downloadState(for: $0.id) == .running }
+    }
+
+    var runningASRModels: [ModelRegistryEntry] {
+        asrModels.filter { downloadState(for: $0.id) == .running }
+    }
+
     private func isCloudModelConfigured(_ entry: ModelRegistryEntry) -> Bool {
         guard let key = entry.config.apiKeySettingsKey else { return false }
         let apiKey = UserDefaults.standard.string(forKey: key) ?? ""

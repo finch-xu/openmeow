@@ -21,6 +21,7 @@ struct OpenMeowApp: App {
         MenuBarExtra("OpenMeow", image: "MenuBarIcon") {
             MenuBarView()
                 .environment(appState)
+                .omTheme()
         }
         .menuBarExtraStyle(.window)
 
@@ -28,6 +29,7 @@ struct OpenMeowApp: App {
             MainContentView()
                 .environment(appState)
         }
-        .defaultSize(width: 780, height: 520)
+        .defaultSize(width: 1180, height: 760)
+        .windowResizability(.contentMinSize)
     }
 }
