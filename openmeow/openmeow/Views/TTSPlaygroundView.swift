@@ -4,7 +4,9 @@ import AVFoundation
 struct TTSPlaygroundView: View {
     @Environment(\.omTheme) private var theme
     @Environment(AppState.self) private var appState
-    @AppStorage(AppConstants.defaultTTSFormatKey) private var format: String = "opus"
+    @AppStorage(AppConstants.defaultTTSFormatKey) private var format: String = "wav"
+
+    private static let locallyPlayableFormats: Set<String> = ["wav", "mp3", "aac", "flac"]
 
     @State private var inputText = "Welcome to OpenMeow — a local voice gateway for the OpenAI API. Try switching voices or tweaking speed on the right."
     @State private var selectedModelID = ""
@@ -132,7 +134,7 @@ struct TTSPlaygroundView: View {
     private var settingsPanel: some View {
         PlaygroundSettingsPanel(endpointPath: "/v1/audio/speech") {
             OMFieldGroup("Model") {
-                OMMenuPicker(selectedModel?.displayName.localized ?? "No models") {
+                OMMenuPicker(verbatim: selectedModel?.displayName.localized ?? String(localized: "No models")) {
                     ForEach(availableModels) { m in
                         Button(m.displayName.localized) { selectedModelID = m.id }
                     }
@@ -216,6 +218,11 @@ struct TTSPlaygroundView: View {
     }
 
     private func generate() {
+        if !Self.locallyPlayableFormats.contains(format) {
+            errorMessage = "\"\(format)\" can't be previewed locally. Use wav / mp3 / aac / flac for in-app playback, or test \(format) via curl."
+            return
+        }
+
         isGenerating = true
         errorMessage = nil
         elapsedTime = nil
@@ -225,7 +232,7 @@ struct TTSPlaygroundView: View {
             let start = Date()
             do {
                 let port = appState.serverPort
-                let url = URL(string: "http://localhost:\(port)/v1/audio/speech")!
+                let url = URL(string: "http://127.0.0.1:\(port)/v1/audio/speech")!
                 var request = URLRequest(url: url)
                 request.httpMethod = "POST"
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -240,15 +247,28 @@ struct TTSPlaygroundView: View {
                 request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
                 let (data, response) = try await URLSession.shared.data(for: request)
-                guard (response as? HTTPURLResponse)?.statusCode == 200 else {
-                    throw NSError(domain: "", code: 0, userInfo: [
-                        NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? "Failed"
+                guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+                    let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+                    let bodyText = String(data: data, encoding: .utf8) ?? "<binary \(data.count) bytes>"
+                    throw NSError(domain: "TTS", code: status, userInfo: [
+                        NSLocalizedDescriptionKey: "HTTP \(status): \(bodyText)"
                     ])
                 }
 
-                let player = try AVAudioPlayer(data: data)
+                let player: AVAudioPlayer
+                do {
+                    player = try AVAudioPlayer(data: data)
+                } catch {
+                    throw NSError(domain: "TTS", code: -1, userInfo: [
+                        NSLocalizedDescriptionKey: "Decode failed for \(format) (\(data.count) bytes). \(error.localizedDescription)"
+                    ])
+                }
                 audioPlayer = player
-                player.play()
+                guard player.play() else {
+                    throw NSError(domain: "TTS", code: -2, userInfo: [
+                        NSLocalizedDescriptionKey: "AVAudioPlayer refused to play \(format) data."
+                    ])
+                }
                 isPlaying = true
                 elapsedTime = Date().timeIntervalSince(start)
 

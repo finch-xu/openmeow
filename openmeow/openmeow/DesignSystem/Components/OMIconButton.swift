@@ -8,7 +8,7 @@ struct OMIconButton: View {
     var variant: OMIconButtonVariant = .ghost
     var size: CGFloat = 28
     var active: Bool = false
-    var help: String? = nil
+    var help: LocalizedStringKey? = nil
     var action: () -> Void = {}
 
     @State private var hover = false

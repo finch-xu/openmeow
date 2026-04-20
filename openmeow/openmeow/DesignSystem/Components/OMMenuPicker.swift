@@ -3,16 +3,29 @@ import SwiftUI
 /// Menu trigger styled as an OM field (rounded surface + chevron).
 struct OMMenuPicker<MenuContent: View>: View {
     @Environment(\.omTheme) private var theme
-    let title: String
+    private let label: Text
     var width: CGFloat? = nil
     var monospace: Bool = false
     let menu: () -> MenuContent
 
-    init(_ title: String,
+    /// Localized title — pass a string literal or `LocalizedStringKey`. Goes through the string catalog.
+    init(_ title: LocalizedStringKey,
          width: CGFloat? = nil,
          monospace: Bool = false,
          @ViewBuilder menu: @escaping () -> MenuContent) {
-        self.title = title
+        self.label = Text(title)
+        self.width = width
+        self.monospace = monospace
+        self.menu = menu
+    }
+
+    /// Verbatim title — pass a runtime-computed string that should NOT be looked up in the string catalog
+    /// (model names, user-provided values, already-localized strings from other sources).
+    init(verbatim title: String,
+         width: CGFloat? = nil,
+         monospace: Bool = false,
+         @ViewBuilder menu: @escaping () -> MenuContent) {
+        self.label = Text(verbatim: title)
         self.width = width
         self.monospace = monospace
         self.menu = menu
@@ -21,7 +34,7 @@ struct OMMenuPicker<MenuContent: View>: View {
     var body: some View {
         Menu(content: menu) {
             HStack {
-                Text(title)
+                label
                     .font(monospace ? .omMono : .omControl)
                     .foregroundStyle(theme.ink)
                 Spacer()

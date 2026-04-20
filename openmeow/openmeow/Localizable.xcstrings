@@ -4,15 +4,18 @@
     "" : {
 
     },
-    "%.1fx" : {
+    "—" : {
 
     },
-    "%@ (%@)" : {
+    "·" : {
+
+    },
+    "%@ used of %@ · %lld%% pressure" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$@ (%2$@)"
+            "value" : "%1$@ used of %2$@ · %3$lld%% pressure"
           }
         }
       }
@@ -20,10 +23,20 @@
     "%lld" : {
 
     },
+    "%lld active" : {
+
+    },
+    "%lld chars" : {
+
+    },
+    "%lld loaded" : {
+
+    },
     "%lld MB" : {
 
     },
     "%lld models loaded" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -53,13 +66,25 @@
     "%lld%%" : {
 
     },
-    "192.168.0.0/16 or 10.0.0.1" : {
+    "+ Add origin" : {
+
+    },
+    "~%llds output" : {
+
+    },
+    "0.5×" : {
+
+    },
+    "1.0×" : {
+
+    },
+    "2.0×" : {
+
+    },
+    "127.0.0.1:%lld" : {
 
     },
     "23333" : {
-
-    },
-    "AAC" : {
 
     },
     "About" : {
@@ -246,7 +271,10 @@
         }
       }
     },
-    "Add Redirect" : {
+    "Add key" : {
+
+    },
+    "alias" : {
 
     },
     "Alias" : {
@@ -261,6 +289,7 @@
       }
     },
     "All" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -270,7 +299,11 @@
         }
       }
     },
+    "All interfaces" : {
+
+    },
     "All interfaces (0.0.0.0)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -291,6 +324,7 @@
       }
     },
     "API Endpoints (OpenAI Compatible)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -301,6 +335,9 @@
       }
     },
     "API Key" : {
+
+    },
+    "API key required" : {
 
     },
     "app.name" : {
@@ -320,6 +357,9 @@
         }
       }
     },
+    "Appearance" : {
+
+    },
     "Apple Silicon required" : {
       "localizations" : {
         "zh-Hans" : {
@@ -331,6 +371,7 @@
       }
     },
     "ASR" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -341,6 +382,7 @@
       }
     },
     "ASR Example" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -351,6 +393,7 @@
       }
     },
     "Authentication" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -361,6 +404,7 @@
       }
     },
     "Auto" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -370,7 +414,11 @@
         }
       }
     },
+    "Auto detect" : {
+
+    },
     "Available Models" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -381,6 +429,7 @@
       }
     },
     "Base URL" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -389,6 +438,12 @@
           }
         }
       }
+    },
+    "BASE URL" : {
+
+    },
+    "Bearer token auth" : {
+
     },
     "Cancel" : {
       "localizations" : {
@@ -400,11 +455,19 @@
         }
       }
     },
-    "Cloud" : {
+    "Changes require a restart" : {
+
+    },
+    "Cloud TTS" : {
+
+    },
+    "Copied" : {
+
+    },
+    "Copy" : {
 
     },
     "Copy API URL" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -415,6 +478,7 @@
       }
     },
     "Copy token" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -423,9 +487,6 @@
           }
         }
       }
-    },
-    "CoreML" : {
-
     },
     "CORS" : {
       "localizations" : {
@@ -437,6 +498,12 @@
         }
       }
     },
+    "Cross-origin requests from browsers" : {
+
+    },
+    "curl -X POST \\" : {
+
+    },
     "Custom Aliases" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -447,6 +514,9 @@
           }
         }
       }
+    },
+    "Dark" : {
+
     },
     "dashboard.copy" : {
       "extractionState" : "manual",
@@ -550,7 +620,22 @@
         }
       }
     },
-    "Default Output Format" : {
+    "Delete" : {
+
+    },
+    "Delete all" : {
+
+    },
+    "Delete all downloaded models?" : {
+
+    },
+    "Delete all models" : {
+
+    },
+    "Deleting…" : {
+
+    },
+    "domain or IP" : {
 
     },
     "Download" : {
@@ -563,10 +648,14 @@
         }
       }
     },
+    "Edit" : {
+
+    },
     "Enable" : {
 
     },
     "Enable Bearer Token Authentication" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -577,6 +666,7 @@
       }
     },
     "Enable CORS (Cross-Origin Requests)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -585,6 +675,9 @@
           }
         }
       }
+    },
+    "Endpoints" : {
+
     },
     "English" : {
       "localizations" : {
@@ -607,16 +700,20 @@
         }
       }
     },
-    "Enter IPs, hostnames, or CIDR ranges (e.g. 192.168.0.0/16). Use \"*\" to allow all origins." : {
+    "Error" : {
 
     },
-    "FLAC" : {
+    "Example · TTS" : {
 
     },
-    "Force Cleanup" : {
+    "Force cleanup" : {
+
+    },
+    "Format" : {
 
     },
     "Generate & Play" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -627,6 +724,7 @@
       }
     },
     "Generate random token" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -637,6 +735,7 @@
       }
     },
     "Generating..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -647,6 +746,7 @@
       }
     },
     "Home" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -656,7 +756,14 @@
         }
       }
     },
+    "HTTP endpoint configuration and examples" : {
+
+    },
+    "INPUT TEXT" : {
+
+    },
     "Installing..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -666,7 +773,11 @@
         }
       }
     },
+    "Installing…" : {
+
+    },
     "LAN" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -686,7 +797,14 @@
         }
       }
     },
+    "Launch at login" : {
+
+    },
+    "Light" : {
+
+    },
     "Listen" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -696,7 +814,17 @@
         }
       }
     },
+    "Listen on" : {
+
+    },
+    "LOADED · %lld" : {
+
+    },
+    "Loaded models" : {
+
+    },
     "Loaded Models" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -707,6 +835,7 @@
       }
     },
     "Loading memory info..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -716,7 +845,11 @@
         }
       }
     },
+    "Loading memory info…" : {
+
+    },
     "Local" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -726,7 +859,14 @@
         }
       }
     },
+    "Local model files" : {
+
+    },
+    "Local TTS" : {
+
+    },
     "Localhost (127.0.0.1)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -736,7 +876,24 @@
         }
       }
     },
+    "Localhost only" : {
+
+    },
+    "localhost:%lld%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "localhost:%1$lld%2$@"
+          }
+        }
+      }
+    },
+    "Manage local and cloud speech models" : {
+
+    },
     "Memory" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -746,7 +903,11 @@
         }
       }
     },
+    "Memory usage" : {
+
+    },
     "Memory Usage" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -756,7 +917,7 @@
         }
       }
     },
-    "MLX" : {
+    "Memory, system, and loaded models" : {
 
     },
     "MLX engine coming soon" : {
@@ -790,9 +951,6 @@
         }
       }
     },
-    "Model Redirects" : {
-
-    },
     "Models" : {
       "localizations" : {
         "zh-Hans" : {
@@ -820,10 +978,8 @@
         }
       }
     },
-    "MP3" : {
-
-    },
     "No %@ models available" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -833,7 +989,14 @@
         }
       }
     },
+    "No aliases set. Clients can use \"tts-1\" / \"whisper-1\" which map automatically to loaded models." : {
+
+    },
+    "No ASR model is running. Download one from Models." : {
+
+    },
     "No ASR models" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -864,7 +1027,11 @@
         }
       }
     },
+    "No models in this category." : {
+
+    },
     "No models installed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -875,6 +1042,7 @@
       }
     },
     "No models loaded" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -884,14 +1052,22 @@
         }
       }
     },
-    "No redirects configured" : {
+    "No models loaded — start a model from the Models page." : {
 
     },
-    "ONNX" : {
+    "No models match your search." : {
+
+    },
+    "No running ASR models" : {
+
+    },
+    "No running TTS models" : {
+
+    },
+    "No TTS model is running. Download one from Models." : {
 
     },
     "Open Dashboard" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -901,13 +1077,16 @@
         }
       }
     },
+    "Open docs" : {
+
+    },
+    "OpenAI-compatible — drop into any client" : {
+
+    },
     "OpenMeow" : {
 
     },
-    "Opus" : {
-
-    },
-    "PCM" : {
+    "Playground" : {
 
     },
     "Port" : {
@@ -921,6 +1100,7 @@
       }
     },
     "Presets" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -931,7 +1111,6 @@
       }
     },
     "Quit OpenMeow" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -942,6 +1121,7 @@
       }
     },
     "Record audio to see transcription" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -951,7 +1131,14 @@
         }
       }
     },
+    "Redirect OpenAI-style names to your loaded models" : {
+
+    },
+    "Regenerate" : {
+
+    },
     "Replay" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -961,7 +1148,11 @@
         }
       }
     },
+    "Report issue" : {
+
+    },
     "Requests must include: `Authorization: Bearer %@`" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -970,6 +1161,9 @@
           }
         }
       }
+    },
+    "Require Authorization: Bearer <token> on all requests" : {
+
     },
     "requirement.apple.silicon" : {
       "extractionState" : "manual",
@@ -998,6 +1192,9 @@
         }
       }
     },
+    "Response format" : {
+
+    },
     "Restart" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1009,6 +1206,7 @@
       }
     },
     "Restart app to apply" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1028,7 +1226,11 @@
         }
       }
     },
+    "Restart the app to apply the language change." : {
+
+    },
     "Result" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1061,6 +1263,12 @@
     "Save" : {
 
     },
+    "Search models…" : {
+
+    },
+    "Security" : {
+
+    },
     "Server" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1070,6 +1278,9 @@
           }
         }
       }
+    },
+    "Server, appearance, and language" : {
+
     },
     "server.status.running %lld" : {
       "extractionState" : "manual",
@@ -1105,9 +1316,6 @@
         }
       }
     },
-    "Set API Key" : {
-
-    },
     "Settings" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1119,6 +1327,7 @@
       }
     },
     "sk-..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1128,7 +1337,14 @@
         }
       }
     },
+    "Speech → Text" : {
+
+    },
+    "Speech Recognition" : {
+
+    },
     "Speed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1138,8 +1354,19 @@
         }
       }
     },
+    "Speed · %@×" : {
+
+    },
+    "Sponsor" : {
+
+    },
+    "Start" : {
+
+    },
+    "Start server" : {
+
+    },
     "Start Server" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1166,8 +1393,13 @@
         }
       }
     },
+    "Stop" : {
+
+    },
+    "Stop server" : {
+
+    },
     "Stop Server" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1186,6 +1418,12 @@
           }
         }
       }
+    },
+    "Stops every loaded engine and deletes all downloaded model files. Cloud-only models are unaffected." : {
+
+    },
+    "Storage" : {
+
     },
     "store.asr.models" : {
       "extractionState" : "manual",
@@ -1231,7 +1469,11 @@
         }
       }
     },
+    "System default" : {
+
+    },
     "System Default" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1242,6 +1484,7 @@
       }
     },
     "Tap to record" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1252,6 +1495,7 @@
       }
     },
     "Tap to stop" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1272,7 +1516,11 @@
         }
       }
     },
+    "Test your loaded models — generate speech or transcribe audio" : {
+
+    },
     "Text" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1282,7 +1530,17 @@
         }
       }
     },
+    "Text → Speech" : {
+
+    },
+    "Theme" : {
+
+    },
+    "This will stop all running engines and permanently remove every model file in %@. You will need to re-download any model you want to use again." : {
+
+    },
     "Token" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1293,6 +1551,7 @@
       }
     },
     "Total %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1303,6 +1562,7 @@
       }
     },
     "Transcribing..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1312,7 +1572,14 @@
         }
       }
     },
+    "Transcribing…" : {
+
+    },
+    "TRANSCRIPT" : {
+
+    },
     "TTS" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1323,6 +1590,7 @@
       }
     },
     "TTS Example" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1332,10 +1600,7 @@
         }
       }
     },
-    "Unload all models and release memory" : {
-
-    },
-    "Used when clients don't specify response_format" : {
+    "Unload" : {
 
     },
     "Voice" : {
@@ -1348,7 +1613,7 @@
         }
       }
     },
-    "WAV" : {
+    "Your transcription will appear here." : {
 
     },
     "简体中文" : {

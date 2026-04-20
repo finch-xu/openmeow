@@ -85,14 +85,8 @@ extension OMTheme {
         codeBg:    Color(hex: 0x0B0D12)
     )
 
-    /// Resolve the active theme for the current color scheme, with optional accent override.
-    /// Accent override lightens for dark mode automatically.
-    static func resolve(colorScheme: ColorScheme, accentHex: UInt32?) -> OMTheme {
-        var theme = colorScheme == .dark ? dark : light
-        guard let hex = accentHex else { return theme }
-        theme.accent = Color(hex: hex)
-        theme.accentSoft = Color(hex: hex, opacity: colorScheme == .dark ? 0.18 : 0.10)
-        return theme
+    static func resolve(colorScheme: ColorScheme) -> OMTheme {
+        colorScheme == .dark ? dark : light
     }
 }
 
@@ -120,31 +114,35 @@ extension Color {
     }
 }
 
-// MARK: - Accent color palette (brand-approved options)
+// MARK: - Theme mode (system / light / dark)
 
-enum OMAccent: UInt32, CaseIterable, Identifiable {
-    case inkBlue   = 0x1F3A5F
-    case violet    = 0x6B3FA0
-    case forest    = 0x2E7D4F
-    case amber     = 0xA7641C
-    case crimson   = 0xB03A2E
-    case steel     = 0x3F5B8F
+enum OMThemeMode: String, CaseIterable, Identifiable {
+    case system, light, dark
+    var id: String { rawValue }
 
-    var id: UInt32 { rawValue }
-    var color: Color { Color(hex: rawValue) }
+    var preferredColorScheme: ColorScheme? {
+        switch self {
+        case .system: nil
+        case .light:  .light
+        case .dark:   .dark
+        }
+    }
 }
 
-// MARK: - ViewModifier to apply theme from colorScheme + stored accent
+// MARK: - ViewModifier to apply theme from user-selected mode (falling back to system)
 
 struct OMThemeModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
-    @AppStorage("omAccentColor") private var accentRaw: Int = Int(OMAccent.inkBlue.rawValue)
+    @Environment(\.colorScheme) private var systemScheme
+    @AppStorage(AppConstants.themeModeKey) private var themeModeRaw: String = OMThemeMode.system.rawValue
 
     func body(content: Content) -> some View {
-        let theme = OMTheme.resolve(colorScheme: colorScheme, accentHex: UInt32(accentRaw))
+        let mode = OMThemeMode(rawValue: themeModeRaw) ?? .system
+        let scheme: ColorScheme = mode.preferredColorScheme ?? systemScheme
+        let theme = OMTheme.resolve(colorScheme: scheme)
         return content
             .environment(\.omTheme, theme)
             .tint(theme.accent)
+            .preferredColorScheme(mode.preferredColorScheme)
     }
 }
 

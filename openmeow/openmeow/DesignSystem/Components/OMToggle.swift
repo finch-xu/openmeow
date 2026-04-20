@@ -26,8 +26,8 @@ struct OMSwitch: View {
 struct OMToggleRow: View {
     @Environment(\.omTheme) private var theme
     let icon: String
-    let label: String
-    let desc: String
+    let label: LocalizedStringKey
+    let desc: LocalizedStringKey
     @Binding var isOn: Bool
 
     var body: some View {

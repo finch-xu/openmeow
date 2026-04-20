@@ -29,7 +29,7 @@ struct OpenMeowApp: App {
             MainContentView()
                 .environment(appState)
         }
-        .defaultSize(width: 1180, height: 760)
+        .defaultSize(width: 1440, height: 900)
         .windowResizability(.contentMinSize)
     }
 }

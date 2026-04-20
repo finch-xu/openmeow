@@ -9,7 +9,7 @@ struct MenuBarView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 8) {
                 OMDot(color: appState.serverRunning ? theme.ok : theme.err,
-                      pulse: appState.serverRunning)
+                      pulse: false)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(appState.serverRunning ? "Running" : "Stopped")
                         .font(.system(size: 12, weight: .semibold))
@@ -70,12 +70,13 @@ struct MenuBarView: View {
         }
         .frame(width: 220)
         .background(theme.surface)
+        .transaction { $0.animation = nil }
     }
 }
 
 private struct MenuBarButton: View {
     @Environment(\.omTheme) private var theme
-    let title: String
+    let title: LocalizedStringKey
     let icon: String
     var destructive: Bool = false
     let action: () -> Void

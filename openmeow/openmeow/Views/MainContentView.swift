@@ -11,7 +11,7 @@ struct MainContentView: View {
     enum SidebarTab: String, Hashable, CaseIterable {
         case playground, models, api, resources, settings
 
-        var label: String {
+        var label: LocalizedStringKey {
             switch self {
             case .playground: "Playground"
             case .models:     "Models"
@@ -49,7 +49,7 @@ struct MainContentView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(minWidth: 900, minHeight: 600)
+        .frame(minWidth: 1100, minHeight: 680)
         .omTheme()
     }
 }
@@ -67,14 +67,18 @@ struct OMSidebar: View {
             HStack(spacing: 10) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .fill(theme.ink)
+                        .fill(Color.white)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                                .strokeBorder(theme.ink.opacity(0.08), lineWidth: 0.5)
+                        )
+                        .shadow(color: Color.black.opacity(theme.name == "dark" ? 0.25 : 0.06),
+                                radius: 2, x: 0, y: 1)
                         .frame(width: 30, height: 30)
                     Image("AppLogo")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 22, height: 22)
-                        .colorInvert()
-                        .brightness(theme.name == "dark" ? -0.05 : 0.85)
                 }
                 VStack(alignment: .leading, spacing: 1) {
                     Text("OpenMeow")
@@ -205,7 +209,7 @@ struct OMSidebar: View {
 struct OMNavItem: View {
     @Environment(\.omTheme) private var theme
     let symbol: String
-    let label: String
+    let label: LocalizedStringKey
     var badge: Int? = nil
     let active: Bool
     let action: () -> Void

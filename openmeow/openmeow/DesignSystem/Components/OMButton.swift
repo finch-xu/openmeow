@@ -23,7 +23,7 @@ enum OMButtonSize { case sm, md, lg
 
 struct OMButton: View {
     @Environment(\.omTheme) private var theme
-    let title: String
+    let title: LocalizedStringKey
     var icon: String? = nil
     var variant: OMButtonVariant = .ghost
     var size: OMButtonSize = .md

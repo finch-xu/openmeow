@@ -2,13 +2,13 @@ import SwiftUI
 
 struct OMCard<Action: View, Content: View>: View {
     @Environment(\.omTheme) private var theme
-    let title: String?
-    let subtitle: String?
+    let title: LocalizedStringKey?
+    let subtitle: LocalizedStringKey?
     let action: Action
     let content: Content
 
-    init(title: String? = nil,
-         subtitle: String? = nil,
+    init(title: LocalizedStringKey? = nil,
+         subtitle: LocalizedStringKey? = nil,
          @ViewBuilder action: () -> Action = { EmptyView() },
          @ViewBuilder content: () -> Content) {
         self.title = title

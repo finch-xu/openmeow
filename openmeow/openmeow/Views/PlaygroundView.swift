@@ -80,17 +80,18 @@ struct OMWaveform: View {
 
 struct OMFieldGroup<Content: View>: View {
     @Environment(\.omTheme) private var theme
-    let label: String
+    let label: LocalizedStringKey
     let content: Content
 
-    init(_ label: String, @ViewBuilder content: () -> Content) {
+    init(_ label: LocalizedStringKey, @ViewBuilder content: () -> Content) {
         self.label = label
         self.content = content()
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
-            Text(label.uppercased())
+            Text(label)
+                .textCase(.uppercase)
                 .font(.system(size: 10.5, weight: .semibold))
                 .tracking(0.4)
                 .foregroundStyle(theme.ink4)

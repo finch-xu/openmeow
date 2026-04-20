@@ -2,10 +2,10 @@ import SwiftUI
 
 struct OMPageTab: Identifiable, Equatable {
     let id: String
-    let label: String
+    let label: LocalizedStringKey
     var count: Int? = nil
 
-    init(id: String, label: String, count: Int? = nil) {
+    init(id: String, label: LocalizedStringKey, count: Int? = nil) {
         self.id = id
         self.label = label
         self.count = count
@@ -14,14 +14,14 @@ struct OMPageTab: Identifiable, Equatable {
 
 struct OMPageHeader<Action: View>: View {
     @Environment(\.omTheme) private var theme
-    let title: String
-    let subtitle: String?
+    let title: LocalizedStringKey
+    let subtitle: LocalizedStringKey?
     let action: Action
     let tabs: [OMPageTab]
     @Binding var activeTab: String
 
-    init(title: String,
-         subtitle: String? = nil,
+    init(title: LocalizedStringKey,
+         subtitle: LocalizedStringKey? = nil,
          tabs: [OMPageTab] = [],
          activeTab: Binding<String> = .constant(""),
          @ViewBuilder action: () -> Action = { EmptyView() }) {

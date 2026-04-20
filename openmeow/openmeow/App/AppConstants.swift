@@ -17,6 +17,7 @@ nonisolated enum AppConstants {
     static let mimoApiKeyKey = "mimoApiKey"
     static let openaiCloudApiKeyKey = "openaiCloudApiKey"
     static let dashscopeApiKeyKey = "dashscopeApiKey"
+    static let themeModeKey = "omThemeMode"
 
     /// Default CORS allowed IPs (plain IP, hostname, or CIDR notation)
     static let corsLocalOrigins = ["127.0.0.1", "localhost", "[::1]"]

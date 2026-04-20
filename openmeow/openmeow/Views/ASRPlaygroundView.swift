@@ -133,7 +133,7 @@ struct ASRPlaygroundView: View {
     private var settingsPanel: some View {
         PlaygroundSettingsPanel(endpointPath: "/v1/audio/transcriptions") {
             OMFieldGroup("Model") {
-                OMMenuPicker(selectedModel?.displayName.localized ?? "No models") {
+                OMMenuPicker(verbatim: selectedModel?.displayName.localized ?? String(localized: "No models")) {
                     ForEach(availableModels) { m in
                         Button(m.displayName.localized) { selectedModelID = m.id }
                     }
@@ -144,7 +144,7 @@ struct ASRPlaygroundView: View {
             }
 
             OMFieldGroup("Language") {
-                OMMenuPicker(selectedLanguage == "auto" ? "Auto detect" : selectedLanguage) {
+                OMMenuPicker(verbatim: selectedLanguage == "auto" ? String(localized: "Auto detect") : selectedLanguage) {
                     Button("Auto detect") { selectedLanguage = "auto" }
                     if let m = selectedModel {
                         ForEach(m.languages, id: \.self) { lang in
@@ -235,7 +235,7 @@ struct ASRPlaygroundView: View {
             let start = Date()
             do {
                 let port = appState.serverPort
-                let apiURL = URL(string: "http://localhost:\(port)/v1/audio/transcriptions")!
+                let apiURL = URL(string: "http://127.0.0.1:\(port)/v1/audio/transcriptions")!
                 let boundary = UUID().uuidString
                 var request = URLRequest(url: apiURL)
                 request.httpMethod = "POST"

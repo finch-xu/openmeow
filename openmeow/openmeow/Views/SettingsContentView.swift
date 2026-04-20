@@ -6,7 +6,7 @@ struct SettingsContentView: View {
     @AppStorage(AppConstants.serverPortKey) private var port = AppConstants.defaultPort
     @AppStorage(AppConstants.listenAddressKey) private var listenAddress = "127.0.0.1"
     @AppStorage("appLanguage") private var appLanguage = "system"
-    @AppStorage("omAccentColor") private var accentRaw: Int = Int(OMAccent.inkBlue.rawValue)
+    @AppStorage(AppConstants.themeModeKey) private var themeModeRaw: String = OMThemeMode.system.rawValue
     @AppStorage("launchAtLogin") private var launchAtLogin = false
 
     @State private var pendingPort: String = ""
@@ -115,21 +115,15 @@ struct SettingsContentView: View {
         OMCard(title: "Appearance") {
             VStack(spacing: 14) {
                 SettingsRow("Theme") {
-                    Text("Follows the system — toggle macOS light/dark to switch.")
-                        .font(.omCaption)
-                        .foregroundStyle(theme.ink3)
-                }
-
-                SettingsRow("Accent") {
-                    HStack(spacing: 10) {
-                        ForEach(OMAccent.allCases) { option in
-                            accentSwatch(option)
-                        }
+                    HStack(spacing: 6) {
+                        themeModeButton(.system, icon: "circle.lefthalf.filled", label: "System")
+                        themeModeButton(.light,  icon: "sun.max.fill",           label: "Light")
+                        themeModeButton(.dark,   icon: "moon.fill",              label: "Dark")
                     }
                 }
 
                 SettingsRow("Language") {
-                    OMMenuPicker(languageLabel, width: 220) {
+                    OMMenuPicker(verbatim: languageLabel, width: 220) {
                         Button("System default") { setLanguage("system") }
                         Button("English") { setLanguage("en") }
                         Button("简体中文") { setLanguage("zh-Hans") }
@@ -148,25 +142,27 @@ struct SettingsContentView: View {
         }
     }
 
-    private func accentSwatch(_ accent: OMAccent) -> some View {
-        let isActive = UInt32(accentRaw) == accent.rawValue
+    private func themeModeButton(_ mode: OMThemeMode, icon: String, label: LocalizedStringKey) -> some View {
+        let isActive = themeModeRaw == mode.rawValue
         return Button {
-            accentRaw = Int(accent.rawValue)
+            themeModeRaw = mode.rawValue
         } label: {
-            Circle()
-                .fill(accent.color)
-                .frame(width: 22, height: 22)
-                .overlay(
-                    Circle().strokeBorder(
-                        isActive ? theme.ink : theme.divider,
-                        lineWidth: isActive ? 2 : 1
-                    )
-                )
-                .padding(isActive ? 2 : 0)
-                .overlay(
-                    Circle().strokeBorder(theme.bg, lineWidth: isActive ? 2 : 0)
-                        .padding(2)
-                )
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 11, weight: .medium))
+                Text(label)
+                    .font(.system(size: 12, weight: .medium))
+            }
+            .foregroundStyle(isActive ? theme.accent : theme.ink2)
+            .padding(.horizontal, 10).padding(.vertical, 5)
+            .background(
+                RoundedRectangle(cornerRadius: OMRadius.sm)
+                    .fill(isActive ? theme.accentSoft : theme.surface)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: OMRadius.sm)
+                    .strokeBorder(isActive ? .clear : theme.divider, lineWidth: 1)
+            )
         }
         .buttonStyle(.plain)
     }
@@ -240,7 +236,7 @@ struct SettingsContentView: View {
         Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
     }
 
-    private func chipButton(label: String, active: Bool, action: @escaping () -> Void) -> some View {
+    private func chipButton(label: LocalizedStringKey, active: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(label)
                 .font(.system(size: 12, weight: .medium))
@@ -263,10 +259,10 @@ struct SettingsContentView: View {
 
 private struct SettingsRow<Value: View>: View {
     @Environment(\.omTheme) private var theme
-    let label: String
+    let label: LocalizedStringKey
     let value: Value
 
-    init(_ label: String, @ViewBuilder _ value: () -> Value) {
+    init(_ label: LocalizedStringKey, @ViewBuilder _ value: () -> Value) {
         self.label = label
         self.value = value()
     }

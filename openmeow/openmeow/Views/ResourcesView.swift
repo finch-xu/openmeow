@@ -63,11 +63,11 @@ struct ResourcesView: View {
         }
     }
 
-    private var memorySubtitle: String {
+    private var memorySubtitle: LocalizedStringKey {
         guard let info = appState.memoryInfo else { return "—" }
         let used = info.appBytes + info.otherBytes
-        let pct = Double(used) / Double(max(info.totalBytes, 1)) * 100
-        return "\(MemoryInfo.format(used)) used of \(MemoryInfo.format(info.totalBytes)) · \(Int(pct))% pressure"
+        let pct = Int(Double(used) / Double(max(info.totalBytes, 1)) * 100)
+        return "\(MemoryInfo.format(used)) used of \(MemoryInfo.format(info.totalBytes)) · \(pct)% pressure"
     }
 
     private var loadedCard: some View {
