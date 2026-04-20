@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Download pre-built sherpa-onnx xcframework for macOS (arm64)
-SHERPA_VERSION="v1.12.34"
+SHERPA_VERSION="v1.12.39"
 FRAMEWORK_DIR="$(cd "$(dirname "$0")/.." && pwd)/Frameworks"
 mkdir -p "$FRAMEWORK_DIR"
 

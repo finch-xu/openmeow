@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/soniqo/speech-swift.git",
       "state" : {
-        "revision" : "433b9106b49083fdf4adacf2314dcdeebd767b8b",
-        "version" : "0.0.7"
+        "revision" : "451ec24402a95eae7f0e17f791c372065412e3aa",
+        "version" : "0.0.11"
       }
     },
     {
