@@ -27,12 +27,15 @@ nonisolated enum ASRRoute {
                 return cors(Response.error(.invalidRequest("Missing required field: file"), status: .badRequest))
             }
 
-            let model = parts.first(where: { $0.name == "model" })?.stringValue ?? "sensevoice"
+            let model = parts.first(where: { $0.name == "model" })?.stringValue
             let language = parts.first(where: { $0.name == "language" })?.stringValue
             let responseFormat = parts.first(where: { $0.name == "response_format" })?.stringValue ?? "json"
 
             guard let resolved = await providerRouter.resolveASR(model: model) else {
-                return cors(Response.error(.modelNotFound(model), status: .notFound))
+                if let model, !model.isEmpty {
+                    return cors(Response.error(.modelNotFound(model), status: .notFound))
+                }
+                return cors(Response.error(.invalidRequest("No ASR model loaded"), status: .notFound))
             }
 
             do {
@@ -44,8 +47,7 @@ nonisolated enum ASRRoute {
                 )
 
                 let responseData = try formatASRResponse(result, format: responseFormat)
-                let ct: String = (responseFormat == "text" || responseFormat == "srt" || responseFormat == "vtt")
-                    ? "text/plain" : "application/json"
+                let ct: String = responseFormat == "text" ? "text/plain" : "application/json"
 
                 return cors(Response(
                     status: .ok,
@@ -146,42 +148,7 @@ nonisolated enum ASRRoute {
     private static func formatASRResponse(_ result: ASRResult, format: String) throws -> Data {
         switch format {
         case "text": return result.text.data(using: .utf8)!
-        case "srt": return formatSRT(result).data(using: .utf8)!
-        case "vtt": return formatVTT(result).data(using: .utf8)!
-        case "verbose_json": return try JSONEncoder().encode(result)
         default: return try JSONEncoder().encode(["text": result.text])
         }
-    }
-
-    private static func formatSRT(_ result: ASRResult) -> String {
-        guard let segments = result.segments, !segments.isEmpty else {
-            return "1\n\(formatTime(0, sep: ",")) --> \(formatTime(result.duration ?? 0, sep: ","))\n\(result.text)\n"
-        }
-        return segments.map { seg in
-            "\(seg.id + 1)\n\(formatTime(seg.start, sep: ",")) --> \(formatTime(seg.end, sep: ","))\n\(seg.text)"
-        }.joined(separator: "\n\n")
-    }
-
-    private static func formatVTT(_ result: ASRResult) -> String {
-        var lines = ["WEBVTT", ""]
-        guard let segments = result.segments, !segments.isEmpty else {
-            lines.append("\(formatTime(0, sep: ".")) --> \(formatTime(result.duration ?? 0, sep: "."))")
-            lines.append(result.text)
-            return lines.joined(separator: "\n")
-        }
-        for seg in segments {
-            lines.append("\(formatTime(seg.start, sep: ".")) --> \(formatTime(seg.end, sep: "."))")
-            lines.append(seg.text)
-            lines.append("")
-        }
-        return lines.joined(separator: "\n")
-    }
-
-    private static func formatTime(_ seconds: Double, sep: String) -> String {
-        let h = Int(seconds) / 3600
-        let m = (Int(seconds) % 3600) / 60
-        let s = Int(seconds) % 60
-        let ms = Int((seconds - Double(Int(seconds))) * 1000)
-        return String(format: "%02d:%02d:%02d\(sep)%03d", h, m, s, ms)
     }
 }

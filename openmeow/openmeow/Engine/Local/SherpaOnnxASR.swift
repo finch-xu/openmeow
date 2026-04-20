@@ -127,16 +127,10 @@ nonisolated extension SherpaOnnxASR: ASRProvider {
     ) async throws -> ASRResult {
         #if SHERPA_ONNX_AVAILABLE
         let result = try await asrActor.transcribe(audio: audio, sampleRate: sampleRate, language: language)
-        let duration = Double(audio.count) / Double(sampleRate)
-        return ASRResult(text: result.text, language: result.lang, duration: duration, segments: nil)
+        return ASRResult(text: result.text)
         #else
         let duration = Double(audio.count) / Double(sampleRate)
-        return ASRResult(
-            text: "[Placeholder] Transcription of \(String(format: "%.1f", duration))s audio",
-            language: language ?? "en",
-            duration: duration,
-            segments: nil
-        )
+        return ASRResult(text: "[Placeholder] Transcription of \(String(format: "%.1f", duration))s audio")
         #endif
     }
 

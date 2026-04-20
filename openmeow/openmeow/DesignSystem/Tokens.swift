@@ -71,7 +71,6 @@ enum OMEngine: String {
         switch engine {
         case .sherpaOnnx: .onnx
         case .speechSwift: .mlx
-        case .whisperKit: .coreml
         case .openaiCloud, .mimoCloud, .qwenCloud: .cloud
         }
     }

@@ -92,14 +92,9 @@ nonisolated extension SpeechSwiftASR: ASRProvider {
         let text = try await modelActor.transcribe(
             audio: audio, sampleRate: sampleRate, language: language
         )
-        let duration = Double(audio.count) / Double(sampleRate)
-        return ASRResult(text: text, language: language, duration: duration, segments: nil)
+        return ASRResult(text: text)
         #else
-        let duration = Double(audio.count) / Double(sampleRate)
-        return ASRResult(
-            text: "[speech-swift not available]",
-            language: language, duration: duration, segments: nil
-        )
+        return ASRResult(text: "[speech-swift not available]")
         #endif
     }
 

@@ -361,48 +361,6 @@
       "config": { "hf_model_id": "aufklarer/Qwen3-ASR-0.6B-MLX-4bit", "quantization_bits": 4 },
       "status": "beta",
       "tested_on": "OpenMeow 0.1.0"
-    },
-    {
-      "id": "whisperkit-large-v3-turbo",
-      "api_id": "whisper-v3-turbo-coreml",
-      "type": "asr",
-      "engine": "whisper-kit",
-      "runtime": "coreml",
-      "family": "whisper",
-      "version": "large-v3-turbo",
-      "license": "MIT",
-      "display_name": { "en": "Whisper Large v3 Turbo (CoreML)", "zh": "Whisper Large v3 Turbo（CoreML）" },
-      "description": { "en": "High-quality ASR, 92+ languages, CoreML accelerated", "zh": "高质量语音识别，92+ 语言，CoreML 加速" },
-      "notes": { "en": "Powered by WhisperKit from Argmax", "zh": "基于 Argmax WhisperKit" },
-      "languages": ["en", "zh", "ja", "ko", "de", "fr", "es", "ru", "it", "pt", "nl", "ar", "hi", "pl", "uk", "tr", "vi", "th", "sv", "da", "fi", "no", "hu", "cs", "ro", "el", "bg", "hr", "sk", "sl", "lt", "lv", "et", "sr", "ca", "gl", "eu", "id", "ms", "tl", "sw"],
-      "streaming": false,
-      "requirements": { "min_memory_gb": 1.0, "recommended_memory_gb": 2.0, "apple_silicon_only": true },
-      "size": { "download_mb": 600, "disk_mb": 600 },
-      "download": { "source": "whisperkit-managed", "url": "", "extract_format": "none" },
-      "config": { "whisper_kit_variant": "openai_whisper-large-v3_turbo" },
-      "status": "stable",
-      "tested_on": "OpenMeow 0.2.0"
-    },
-    {
-      "id": "whisperkit-base",
-      "api_id": "whisper-base-coreml",
-      "type": "asr",
-      "engine": "whisper-kit",
-      "runtime": "coreml",
-      "family": "whisper",
-      "version": "base",
-      "license": "MIT",
-      "display_name": { "en": "Whisper Base (CoreML)", "zh": "Whisper Base（CoreML 轻量）" },
-      "description": { "en": "Lightweight ASR, fast inference", "zh": "轻量语音识别，推理快速" },
-      "notes": { "en": "Good for quick transcription", "zh": "适合快速转录" },
-      "languages": ["en", "zh", "ja", "ko", "de", "fr", "es", "ru", "it", "pt"],
-      "streaming": false,
-      "requirements": { "min_memory_gb": 0.3, "recommended_memory_gb": 0.5 },
-      "size": { "download_mb": 150, "disk_mb": 150 },
-      "download": { "source": "whisperkit-managed", "url": "", "extract_format": "none" },
-      "config": { "whisper_kit_variant": "openai_whisper-base" },
-      "status": "stable",
-      "tested_on": "OpenMeow 0.2.0"
     }
   ]
 }

@@ -78,7 +78,13 @@ actor ProviderRouter {
         return ResolvedTTS(provider: provider, resolvedModel: resolved)
     }
 
-    func resolveASR(model: String) -> ResolvedASR? {
+    func resolveASR(model: String?) -> ResolvedASR? {
+        guard let model, !model.isEmpty else {
+            // No model specified: fall back to the first loaded ASR (deterministic by sorted key).
+            guard let modelID = asrProviders.keys.sorted().first,
+                  let provider = asrProviders[modelID] else { return nil }
+            return ResolvedASR(provider: provider, resolvedModel: modelID)
+        }
         let resolved = aliases[model] ?? model
         guard let provider = asrProviders[resolved] else { return nil }
         return ResolvedASR(provider: provider, resolvedModel: resolved)

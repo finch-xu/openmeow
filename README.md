@@ -36,7 +36,7 @@
 
 - **Menu bar app** — runs quietly in the background on macOS (Apple Silicon)
 - **OpenAI-compatible API** — drop-in replacement for `/v1/audio/speech` and `/v1/audio/transcriptions`
-- **Multiple engines** — sherpa-onnx, WhisperKit, speech-swift (Qwen3-TTS/ASR)
+- **Multiple engines** — sherpa-onnx, speech-swift (Qwen3-TTS/ASR)
 - **Cloud TTS** — OpenAI-compatible, MiMo, and Qwen3 TTS Flash (DashScope) with 40+ voices
 - **Audio format support** — WAV, MP3, Opus (OGG/WebM), PCM, FLAC, AAC
 - **Model store** — download and manage models from the built-in registry
@@ -184,7 +184,6 @@ open openmeow/openmeow.xcodeproj
 | Component | License | Link |
 |-----------|---------|------|
 | [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) | Apache-2.0 | On-device speech (TTS/ASR) |
-| [WhisperKit](https://github.com/argmaxinc/WhisperKit) | MIT | CoreML-based speech recognition |
 | [speech-swift](https://github.com/soniqo/speech-swift) | Apache-2.0 | Qwen3-TTS/ASR via MLX |
 | [Hummingbird](https://github.com/hummingbird-project/hummingbird) | Apache-2.0 | Lightweight HTTP server |
 | [Opus](https://github.com/xiph/opus) / [Ogg](https://github.com/xiph/ogg) | BSD-3-Clause | Audio codec |

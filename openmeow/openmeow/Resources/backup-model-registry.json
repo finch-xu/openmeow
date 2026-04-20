@@ -407,38 +407,6 @@
       "config": { "hf_model_id": "aufklarer/Qwen3-ASR-0.6B-MLX-4bit" },
       "status": "beta",
       "tested_on": "OpenMeow 0.1.0"
-    },
-    {
-      "id": "ttskit-qwen3-tts-0.6b",
-      "api_id": "qwen3-tts-0.6b-coreml",
-      "type": "tts",
-      "engine": "whisper-kit",
-      "runtime": "coreml",
-      "family": "qwen3-tts",
-      "version": "0.6B",
-      "license": "MIT",
-      "display_name": { "en": "Qwen3-TTS 0.6B (CoreML)", "zh": "Qwen3-TTS 0.6B（CoreML）" },
-      "description": { "en": "High-quality TTS via TTSKit, CoreML accelerated", "zh": "高质量语音合成，CoreML 加速" },
-      "notes": { "en": "Powered by TTSKit from Argmax", "zh": "基于 Argmax TTSKit" },
-      "languages": ["en", "zh", "ja", "ko", "de", "fr", "es", "ru", "it", "pt"],
-      "voice_list": [
-        { "id": "vivian", "name": "Vivian", "language": "zh", "gender": "female" },
-        { "id": "serena", "name": "Serena", "language": "zh", "gender": "female" },
-        { "id": "uncle_fu", "name": "Uncle Fu", "language": "zh", "gender": "male" },
-        { "id": "dylan", "name": "Dylan", "language": "zh", "gender": "male" },
-        { "id": "eric", "name": "Eric", "language": "zh", "gender": "male" },
-        { "id": "ryan", "name": "Ryan", "language": "en", "gender": "male" },
-        { "id": "aiden", "name": "Aiden", "language": "en", "gender": "male" },
-        { "id": "ono_anna", "name": "Ono Anna", "language": "ja", "gender": "female" },
-        { "id": "sohee", "name": "Sohee", "language": "ko", "gender": "female" }
-      ],
-      "sample_rate": 24000,
-      "requirements": { "min_memory_gb": 2.0, "recommended_memory_gb": 4.0, "apple_silicon_only": true },
-      "size": { "download_mb": 1000, "disk_mb": 1000 },
-      "download": { "source": "whisperkit-managed", "url": "", "extract_format": "none" },
-      "config": { "tts_kit_variant": "qwen3TTS_0_6b" },
-      "status": "stable",
-      "tested_on": "OpenMeow 0.2.0"
     }
   ]
 }

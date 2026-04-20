@@ -1,21 +1,7 @@
 import Foundation
 
-nonisolated enum ASRResponseFormat: String, Codable, Sendable {
-    case json, text, srt, verbose_json, vtt
-}
-
-nonisolated struct ASRSegment: Codable, Sendable {
-    let id: Int
-    let start: Double
-    let end: Double
-    let text: String
-}
-
 nonisolated struct ASRResult: Codable, Sendable {
     let text: String
-    let language: String?
-    let duration: Double?
-    let segments: [ASRSegment]?
 }
 
 nonisolated protocol ASRProvider: Sendable {

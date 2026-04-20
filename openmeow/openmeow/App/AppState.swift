@@ -113,7 +113,7 @@ final class AppState {
 
         // Auto-load all installed models (skip user-disabled ones and unimplemented engines)
         let disabledIDs = Set(UserDefaults.standard.stringArray(forKey: AppConstants.disabledModelsKey) ?? [])
-        for entry in allEntries where entry.engine == .sherpaOnnx || entry.engine == .whisperKit || entry.engine == .speechSwift || entry.engine.isCloud {
+        for entry in allEntries where entry.engine == .sherpaOnnx || entry.engine == .speechSwift || entry.engine.isCloud {
             guard !disabledIDs.contains(entry.id) else { continue }
             if entry.engine.isCloud {
                 guard isCloudModelConfigured(entry) else { continue }
@@ -263,12 +263,6 @@ final class AppState {
         guard !(await providerRouter.isModelLoaded(modelID)) else { return }
 
         do {
-            // Show loading spinner for WhisperKit (CoreML compilation can be slow)
-            if entry.engine == .whisperKit {
-                await modelManager.setModelState(modelID, .extracting)
-                await refreshDownloadStates()
-            }
-
             switch entry.engine {
             case .sherpaOnnx:
                 if entry.type == .tts {
@@ -283,23 +277,6 @@ final class AppState {
                     let provider = try SherpaOnnxASR(
                         modelPath: modelPath, modelID: modelID,
                         family: entry.family, config: entry.config, languages: entry.languages
-                    )
-                    await providerRouter.registerASR(provider, for: modelID)
-                }
-
-            case .whisperKit:
-                if entry.type == .tts {
-                    let variant = entry.config.ttsKitVariant ?? "qwen3TTS_0_6b"
-                    let provider = try await WhisperKitTTS(
-                        modelID: modelID, modelPath: modelPath,
-                        variant: variant, voices: entry.voiceList ?? []
-                    )
-                    await providerRouter.registerTTS(provider, for: modelID)
-                } else {
-                    let variant = entry.config.whisperKitVariant ?? "openai_whisper-base"
-                    let provider = try await WhisperKitASR(
-                        modelID: modelID, modelPath: modelPath,
-                        variant: variant, languages: entry.languages
                     )
                     await providerRouter.registerASR(provider, for: modelID)
                 }
@@ -386,12 +363,6 @@ final class AppState {
             return
         }
 
-        // WhisperKit models use their SDK's download API
-        if entry.engine == .whisperKit {
-            downloadWhisperKitModel(entry)
-            return
-        }
-
         // speech-swift models use fromPretrained (download + init combined)
         if entry.engine == .speechSwift {
             downloadSpeechSwiftModel(entry)
@@ -416,51 +387,6 @@ final class AppState {
                 pollTask.cancel()
                 await refreshDownloadStates()
                 logger.error("Download failed for \(modelID): \(error)")
-            }
-        }
-    }
-
-    private func downloadWhisperKitModel(_ entry: ModelRegistryEntry) {
-        let modelID = entry.id
-        Task {
-            do {
-                await modelManager.setModelDownloading(modelID)
-                await refreshDownloadStates()
-
-                let modelsDir = AppConstants.modelsDirectory
-                try FileManager.default.createDirectory(at: modelsDir, withIntermediateDirectories: true)
-
-                let downloadedURL: URL
-                if entry.type == .tts {
-                    let variant = entry.config.ttsKitVariant ?? "qwen3TTS_0_6b"
-                    downloadedURL = try await WhisperKitTTS.downloadModel(variant: variant, to: modelsDir)
-                } else {
-                    let variant = entry.config.whisperKitVariant ?? "openai_whisper-base"
-                    downloadedURL = try await WhisperKitASR.downloadModel(variant: variant, to: modelsDir)
-                }
-
-                // Rename downloaded directory to our modelID so ModelManager recognizes it
-                let modelDir = modelsDir.appendingPathComponent(modelID)
-                if downloadedURL.lastPathComponent != modelID {
-                    if FileManager.default.fileExists(atPath: modelDir.path) {
-                        try FileManager.default.removeItem(at: modelDir)
-                    }
-                    try FileManager.default.moveItem(at: downloadedURL, to: modelDir)
-                }
-
-                // Pre-compile CoreML models so "Start" is instant for the user
-                await modelManager.setModelState(modelID, .extracting)
-                await refreshDownloadStates()
-                logger.info("Pre-compiling CoreML models for \(modelID)...")
-                await loadModelEngine(entry)
-
-                // loadModelEngine sets .running on success or .error on failure
-                await refreshDownloadStates()
-                logger.info("WhisperKit model ready: \(modelID)")
-            } catch {
-                await modelManager.setModelError(modelID, error.localizedDescription)
-                await refreshDownloadStates()
-                logger.error("WhisperKit download failed for \(modelID): \(error)")
             }
         }
     }

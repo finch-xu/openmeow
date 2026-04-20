@@ -54,7 +54,6 @@ nonisolated enum ModelType: String, Codable, Sendable {
 nonisolated enum EngineType: String, Codable, Sendable {
     case sherpaOnnx = "sherpa-onnx"
     case speechSwift = "speech-swift"
-    case whisperKit = "whisper-kit"
     case openaiCloud = "openai-cloud"
     case mimoCloud = "mimo-cloud"
     case qwenCloud = "qwen-cloud"
@@ -76,7 +75,6 @@ nonisolated enum DownloadSource: String, Codable, Sendable {
     case huggingface
     case modelscope
     case customUrl = "custom-url"
-    case whisperKitManaged = "whisperkit-managed"
     case cloudManaged = "cloud-managed"
 }
 
@@ -188,10 +186,6 @@ nonisolated struct ModelConfig: Codable, Sendable {
     // speech-swift (HuggingFace)
     let hfModelId: String?
     let quantizationBits: Int?   // 4 or 8
-
-    // WhisperKit / TTSKit
-    let whisperKitVariant: String?
-    let ttsKitVariant: String?
 
     // Cloud TTS
     let cloudEndpoint: String?

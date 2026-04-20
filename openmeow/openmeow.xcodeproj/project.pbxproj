@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		6ADFDD852F7579F800036C04 /* Hummingbird in Frameworks */ = {isa = PBXBuildFile; productRef = AA000001AAAA000100000001 /* Hummingbird */; };
-		BB000004BBBB000400000004 /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = BB000002BBBB000200000002 /* WhisperKit */; };
-		BB000005BBBB000500000005 /* TTSKit in Frameworks */ = {isa = PBXBuildFile; productRef = BB000003BBBB000300000003 /* TTSKit */; };
 		CC000004CCCC000400000004 /* Qwen3TTS in Frameworks */ = {isa = PBXBuildFile; productRef = CC000002CCCC000200000002 /* Qwen3TTS */; };
 		CC000005CCCC000500000005 /* Qwen3ASR in Frameworks */ = {isa = PBXBuildFile; productRef = CC000003CCCC000300000003 /* Qwen3ASR */; };
 /* End PBXBuildFile section */
@@ -32,8 +30,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				6ADFDD852F7579F800036C04 /* Hummingbird in Frameworks */,
-				BB000004BBBB000400000004 /* WhisperKit in Frameworks */,
-				BB000005BBBB000500000005 /* TTSKit in Frameworks */,
 				CC000004CCCC000400000004 /* Qwen3TTS in Frameworks */,
 				CC000005CCCC000500000005 /* Qwen3ASR in Frameworks */,
 			);
@@ -82,8 +78,6 @@
 			name = openmeow;
 			packageProductDependencies = (
 				AA000001AAAA000100000001 /* Hummingbird */,
-				BB000002BBBB000200000002 /* WhisperKit */,
-				BB000003BBBB000300000003 /* TTSKit */,
 				CC000002CCCC000200000002 /* Qwen3TTS */,
 				CC000003CCCC000300000003 /* Qwen3ASR */,
 			);
@@ -118,7 +112,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				AA000002AAAA000200000002 /* XCRemoteSwiftPackageReference "hummingbird" */,
-				BB000001BBBB000100000001 /* XCRemoteSwiftPackageReference "WhisperKit" */,
 				CC000001CCCC000100000001 /* XCRemoteSwiftPackageReference "speech-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -360,7 +353,7 @@
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) SHERPA_ONNX_AVAILABLE WHISPERKIT_AVAILABLE SPEECH_SWIFT_AVAILABLE OPUS_AVAILABLE LAME_AVAILABLE";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) SHERPA_ONNX_AVAILABLE SPEECH_SWIFT_AVAILABLE OPUS_AVAILABLE LAME_AVAILABLE";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -413,7 +406,7 @@
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) SHERPA_ONNX_AVAILABLE WHISPERKIT_AVAILABLE SPEECH_SWIFT_AVAILABLE OPUS_AVAILABLE LAME_AVAILABLE";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) SHERPA_ONNX_AVAILABLE SPEECH_SWIFT_AVAILABLE OPUS_AVAILABLE LAME_AVAILABLE";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -455,14 +448,6 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		BB000001BBBB000100000001 /* XCRemoteSwiftPackageReference "WhisperKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/argmaxinc/WhisperKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.17.0;
-			};
-		};
 		CC000001CCCC000100000001 /* XCRemoteSwiftPackageReference "speech-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/soniqo/speech-swift.git";
@@ -478,16 +463,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AA000002AAAA000200000002 /* XCRemoteSwiftPackageReference "hummingbird" */;
 			productName = Hummingbird;
-		};
-		BB000002BBBB000200000002 /* WhisperKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BB000001BBBB000100000001 /* XCRemoteSwiftPackageReference "WhisperKit" */;
-			productName = WhisperKit;
-		};
-		BB000003BBBB000300000003 /* TTSKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BB000001BBBB000100000001 /* XCRemoteSwiftPackageReference "WhisperKit" */;
-			productName = TTSKit;
 		};
 		CC000002CCCC000200000002 /* Qwen3TTS */ = {
 			isa = XCSwiftPackageProductDependency;
